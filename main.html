@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guitar Chord Explorer</title>
+<style>
+:root{--bg:#0e1116;--panel:#171b22;--line:#2a313c;--tx:#e8eaee;--mut:#8b94a3;--acc:#f5a524;--root:#2dd4bf;--on:#1a1206;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f1ec;--panel:#fff;--line:#ddd6cb;--tx:#1d1a16;--mut:#6b655b;--acc:#c2410c;--root:#0f766e;--on:#fff;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f4f1ec;--panel:#fff;--line:#ddd6cb;--tx:#1d1a16;--mut:#6b655b;--acc:#c2410c;--root:#0f766e;--on:#fff;color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{max-width:1180px;margin:0 auto;padding:16px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.app{grid-template-columns:340px minmax(0,1fr)}header{grid-column:1/-1}}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0;font-size:22px;letter-spacing:-.01em}h3{margin:16px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+input{background:var(--panel);border:1px solid var(--line);color:var(--tx);padding:10px 14px;border-radius:12px;font:inherit;min-width:min(100%,260px)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.b,.chip,.vr{background:transparent;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;transition:background .2s,border-color .2s}
+.b:hover,.chip:hover,.vr:hover{border-color:var(--acc)}
+.on{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;margin-top:12px;max-height:230px;overflow:auto}
+.chip{padding:7px 4px;text-align:center}
+.vr{display:flex;justify-content:space-between;width:100%;margin-bottom:6px;text-align:left}.vr small{color:inherit;opacity:.7}
+.top,.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.top h2{margin:0;font-size:22px;text-align:center;flex:1}.top h2 small{display:block;font-size:13px;color:var(--mut);font-weight:400}
+.stage{width:min(100%,520px);aspect-ratio:4/5;margin:12px auto;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#1c222c,#0a0d12);border:1px solid var(--line)}
+svg{width:100%;height:100%;display:block}
+.bar{justify-content:center}
+.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.3)}}
+@media(prefers-reduced-motion:reduce){.pop{animation:none}}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:14px}
+.meta div,.st div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.meta span,.st span{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.st{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px;text-align:center}.st div{padding:6px 2px}.st .r{border-color:var(--root);color:var(--root)}
+.ok{color:var(--root);font-size:13px;margin-top:10px}.foot{color:var(--mut);font-size:12px;margin-top:8px}
+</style></head><body>
+<div class="app">
+<header><h1>🎸 Guitar Chord Explorer</h1><input id="q" placeholder="Cari chord: C, F#m, Bb…" autocomplete="off" aria-label="Cari chord"></header>
+<aside class="card">
+ <div class="seg" id="flt"></div><div class="chips" id="chips"></div>
+ <h3>Variasi bentuk</h3><div id="vars"></div>
+</aside>
+<main class="card">
+ <div class="top"><button class="b" data-a="prev" aria-label="Chord sebelumnya">‹ Sebelumnya</button><h2 id="ttl"></h2><button class="b" data-a="next" aria-label="Chord berikutnya">Berikutnya ›</button></div>
+ <div class="stage"><svg id="svg" viewBox="0 0 10 10"></svg></div>
+ <div class="bar">
+  <button class="b" data-a="zin">Perbesar</button><button class="b" data-a="zout">Perkecil</button><button class="b" data-a="reset">Reset</button>
+  <button class="b" data-a="tp" data-d="-1">Transpose −</button><button class="b" data-a="tp" data-d="1">Transpose +</button><button class="b" data-a="fav" id="fav">☆ Favorit</button>
+ </div>
+ <div id="info"></div>
+</main></div>
+<script>
+/* ===== 1. CHORD DATABASE (tuning, nada, chord open) ===== */
+const N=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const OPEN=[4,9,2,7,11,4], STR=['E','A','D','G','B','E'];   // tuning standar E-A-D-G-B-E (low→high)
+const X=null, FN={1:'Telunjuk',2:'Jari tengah',3:'Jari manis',4:'Kelingking'};
+const OPEN_CH={maj:{C:{f:[X,3,2,0,1,0],g:[0,3,2,0,1,0]},D:{f:[X,X,0,2,3,2],g:[0,0,0,1,3,2]},E:{f:[0,2,2,1,0,0],g:[0,2,3,1,0,0]},G:{f:[3,2,0,0,0,3],g:[2,1,0,0,0,3]},A:{f:[X,0,2,2,2,0],g:[0,0,1,2,3,0]}},
+ min:{A:{f:[X,0,2,2,1,0],g:[0,0,2,3,1,0]},D:{f:[X,X,0,2,3,1],g:[0,0,0,2,3,1]},E:{f:[0,2,2,0,0,0],g:[0,2,3,0,0,0]}}};
+/* ===== 2. FINGERING DEFINITIONS (movable shapes; rel = offset dari fret akar) ===== */
+const SH=[
+ {id:'E',lab:'Gantung – E Shape',grp:1,rs:0,bar:[0,5],maj:{r:[0,2,2,1,0,0],g:[1,3,4,2,1,1]},min:{r:[0,2,2,0,0,0],g:[1,3,4,1,1,1]}},
+ {id:'A',lab:'Gantung – A Shape',grp:1,rs:1,bar:[1,5],maj:{r:[X,0,2,2,2,0],g:[0,1,2,3,4,1]},min:{r:[X,0,2,2,1,0],g:[0,1,3,4,2,1]}},
+ {id:'D',lab:'D-Shape Voicing (tanpa gantung penuh)',grp:1,rs:2,maj:{r:[X,X,0,2,3,2],g:[0,0,1,2,4,3]},min:{r:[X,X,0,2,3,1],g:[0,0,1,3,4,2]}},
+ {id:'P6',lab:'Power Chord – akar senar 6',grp:2,rs:0,pow:1,a0:1,maj:{r:[0,2,2,X,X,X],g:[1,3,4,0,0,0]},min:{r:[0,2,2,X,X,X],g:[1,3,4,0,0,0]}},
+ {id:'P5',lab:'Power Chord – akar senar 5',grp:2,rs:1,pow:1,a0:1,maj:{r:[X,0,2,2,X,X],g:[0,1,3,4,0,0]},min:{r:[X,0,2,2,X,X],g:[0,1,3,4,0,0]}},
+ {id:'T',lab:'Alternatif – Triad senar atas',grp:2,rs:3,bar:[3,4],maj:{r:[X,X,X,0,0,3],g:[0,0,0,1,1,4]}}];
+const GRP=['Open Chord','Kunci Gantung & Bentuk Geser (E / A / D)','Voicing Lanjutan'];
+/* ===== validator: setiap voicing diuji terhadap teori musik ===== */
+const notesOf=v=>v.fr.map((f,s)=>f==null?null:(OPEN[s]+f)%12);
+function validate(v,r,t){const n=notesOf(v),s=n.filter(x=>x!=null),th=(r+(t=='maj'?4:3))%12,fi=(r+7)%12,al=v.pow?[r,fi]:[r,th,fi];
+ const fm={};v.fr.forEach((f,i)=>{if(f>0){(fm[v.fg[i]]=fm[v.fg[i]]||new Set()).add(f)}});
+ const fingersOk=v.fr.every((f,i)=>!(f>0)||v.fg[i]>0)&&Object.values(fm).every(z=>z.size==1);
+ return{ok:s.length>=2&&s.every(x=>al.includes(x))&&al.every(a=>s.includes(a))&&s[0]==r&&fingersOk&&v.fr.every(f=>f==null||(f>=0&&f<=15)),n}}
+function build(r,t,raw){const o=[],e=OPEN_CH[t][N[r]];
+ if(e)o.push({id:'open',lab:'Open Position',grp:0,fr:e.f,fg:e.g,sh:'Open'});
+ for(const s of SH){const d=s[t];if(!d)continue;const f=(r-OPEN[s.rs]+12)%12;if(!f&&!s.a0)continue;
+  o.push({id:s.id,lab:s.lab,grp:s.grp,pow:s.pow,fr:d.r.map(x=>x==null?null:x+f),fg:d.g,sh:s.lab,bar:s.bar?{fret:f,from:s.bar[0],to:s.bar[1]}:null})}
+ return raw?o:o.filter(v=>validate(v,r,t).ok)}
+/* ===== 3. FRETBOARD VISUALIZATION (SVG vertikal, skala fret nyata) ===== */
+const $=s=>document.querySelector(s),svg=$('#svg');
+const SP=44,NX=80,Y0=120,SC=1000/(1-2**(-15/12)),CX=NX+2.5*SP;
+const yF=n=>Y0+SC*(1-2**(-n/12)),yc=n=>(yF(n-1)+yF(n))/2,sx=s=>NX+s*SP;
+function board(){const w=5*SP+48,ye=yF(15)+14;let h=`<defs><linearGradient id="wd" x1="0" x2="1"><stop offset="0" stop-color="#3b2517"/><stop offset=".5" stop-color="#4b311f"/><stop offset="1" stop-color="#34200f"/></linearGradient></defs>
+<rect x="${NX-24}" y="14" width="${w}" height="${Y0-14}" rx="18" fill="#22160e" stroke="#000" stroke-opacity=".4"/>
+<rect x="${NX-24}" y="${Y0}" width="${w}" height="${ye-Y0}" fill="url(#wd)"/>`;
+ STR.forEach((n,s)=>h+=`<circle cx="${sx(s)}" cy="62" r="13" fill="#2f2013" stroke="#8b6b3d"/><text x="${sx(s)}" y="67" text-anchor="middle" font-size="14" fill="#e9d9b8">${n}</text>`);
+ for(const n of [3,5,7,9,15])h+=`<circle cx="${CX}" cy="${yc(n)}" r="7" fill="#e6d7b5" opacity=".35"/>`;
+ h+=`<circle cx="${CX-SP}" cy="${yc(12)}" r="7" fill="#e6d7b5" opacity=".35"/><circle cx="${CX+SP}" cy="${yc(12)}" r="7" fill="#e6d7b5" opacity=".35"/>`;
+ for(let n=1;n<=15;n++)h+=`<line x1="${NX-24}" x2="${NX+5*SP+24}" y1="${yF(n)}" y2="${yF(n)}" stroke="#c4c9d1" stroke-width="2.4"/><text x="${NX-34}" y="${yc(n)+5}" text-anchor="end" font-size="14" style="fill:var(--mut)">${n}</text>`;
+ h+=`<rect x="${NX-24}" y="${Y0-6}" width="${w}" height="8" rx="2" fill="#efe6d2"/>`;
+ [3.4,2.8,2.2,1.7,1.3,1].forEach((sw,s)=>h+=`<line x1="${sx(s)}" x2="${sx(s)}" y1="${Y0}" y2="${ye}" stroke="${s<3?'#c9a66b':'#dfe3e9'}" stroke-width="${sw}"/>`);
+ return h+'<g id="ch"></g>'}
+svg.innerHTML=board();
+function chordLayer(v,r){const u=v.fr.filter(f=>f>0),mn=u.length?Math.min(...u):0,my=mn<=3?Y0-20:yc(mn-1);let h='';
+ if(v.bar){const y=yc(v.bar.fret);h+=`<rect class="pop" x="${sx(v.bar.from)-17}" y="${y-17}" width="${sx(v.bar.to)-sx(v.bar.from)+34}" height="34" rx="17" fill="var(--acc)"/><text x="${sx(v.bar.from)}" y="${y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="var(--on)">1</text>`}
+ const nn=notesOf(v);
+ v.fr.forEach((f,s)=>{const x=sx(s);
+  if(f==null)h+=`<text x="${x}" y="${my+6}" text-anchor="middle" font-size="20" font-weight="700" style="fill:var(--mut)">✕</text>`;
+  else if(f==0)h+=`<circle class="pop" cx="${x}" cy="${my}" r="9" fill="none" stroke="${nn[s]==r?'var(--root)':'#e9d9b8'}" stroke-width="3"/>`;
+  else{const inB=v.bar&&f==v.bar.fret&&v.fg[s]==1,y=yc(f),rt=nn[s]==r;
+   if(inB){if(rt)h+=`<circle class="pop" cx="${x}" cy="${y}" r="7" fill="var(--root)" stroke="#fff" stroke-width="2"/>`}
+   else h+=`<circle class="pop" cx="${x}" cy="${y}" r="16" fill="${rt?'var(--root)':'var(--acc)'}" stroke="#0006" stroke-width="1.5"/><text x="${x}" y="${y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="var(--on)">${v.fg[s]}</text>`}});
+ return h}
+/* ===== 4. ZOOM ANIMATION LOGIC (kamera = viewBox, rasio tetap → tidak ada distorsi) ===== */
+const A=.8,H=1140,W=H*A;let cam={x:CX-W/2,y:0,w:W,h:H},raf;
+function target(v,z){if(!z||!v)return{x:CX-W/2,y:0,w:W,h:H};
+ const u=v.fr.filter(f=>f>0),mn=u.length?Math.min(...u):0,mx=u.length?Math.max(...u):1,lo=mn<=3?0:mn-2,hi=Math.min(15,mx+1);
+ let top=lo?yF(lo)-6:Y0-90,bot=yF(hi)+16,h=Math.max(bot-top,400);const mid=(top+bot)/2;top=Math.max(0,mid-h/2);if(top+h>H)top=H-h;
+ return{x:CX-h*A/2,y:top,w:h*A,h}}
+function go(t){cancelAnimationFrame(raf);const a={...cam},t0=performance.now(),ms=matchMedia('(prefers-reduced-motion:reduce)').matches?1:850;
+ (function f(n){let p=Math.min(1,(n-t0)/ms);p=p<.5?4*p*p*p:1-(-2*p+2)**3/2;for(const k of'xywh')cam[k]=a[k]+(t[k]-a[k])*p;
+  svg.setAttribute('viewBox',`${cam.x} ${cam.y} ${cam.w} ${cam.h}`);if(p<1)raf=requestAnimationFrame(f)})(t0)}
+/* ===== 5. CHORD SELECTION INTERFACE ===== */
+const S={r:0,t:'maj',vid:'open',z:true,f:'all',q:''};let favs=new Set;
+try{favs=new Set(JSON.parse(localStorage.getItem('gce-fav')||'[]'))}catch(e){}
+const nm=(r,t)=>N[r]+(t=='min'?'m':''),key=(r,t)=>r+t;
+const norm=q=>q.trim().replace('♯','#').replace(/^([a-g])b/i,(m,l)=>N[(N.indexOf(l.toUpperCase())+11)%12]);
+function list(){const q=norm(S.q).toLowerCase(),o=[];for(const t of['maj','min'])for(let r=0;r<12;r++){
+ if(S.f=='maj'&&t!='maj'||S.f=='min'&&t!='min'||S.f=='fav'&&!favs.has(key(r,t)))continue;
+ if(q&&!nm(r,t).toLowerCase().startsWith(q))continue;o.push([r,t])}return o}
+const vars=()=>build(S.r,S.t),cur=()=>{const L=vars();return L.find(v=>v.id==S.vid)||L[0]};
+function pick(r,t,vid){S.r=r;S.t=t;const L=vars();S.vid=vid&&L.some(v=>v.id==vid)?vid:L[0].id;render()}
+function render(){const v=cur(),L=vars(),r=S.r,t=S.t,nn=notesOf(v),pos=Math.min(...v.fr.filter(f=>f>0),99);
+ $('#flt').innerHTML=[['all','Semua'],['maj','Major'],['min','Minor'],['fav','★ Favorit']].map(([k,l])=>`<button class="b ${S.f==k?'on':''}" data-a="flt" data-f="${k}">${l}</button>`).join('');
+ $('#chips').innerHTML=list().map(([a,b])=>`<button class="chip ${a==r&&b==t?'on':''}" data-a="chip" data-r="${a}" data-t="${b}">${nm(a,b)}</button>`).join('')||'<small style="color:var(--mut)">Tidak ada chord.</small>';
+ $('#vars').innerHTML=GRP.map((g,i)=>{const m=L.filter(x=>x.grp==i);return m.length?`<h3 style="margin-top:10px">${g}</h3>`+m.map(x=>{const u=x.fr.filter(f=>f>0);return`<button class="vr ${x.id==v.id?'on':''}" data-a="vid" data-v="${x.id}"><span>${nm(r,t)} ${x.lab}</span><small>${u.length?'Fret '+Math.min(...u):'Open'}</small></button>`}).join(''):''}).join('');
+ const full=N[r]+(t=='min'?' Minor':' Major');$('#ttl').innerHTML=`${full}<small>${v.lab}</small>`;
+ $('#fav').textContent=favs.has(key(r,t))?'★ Favorit':'☆ Favorit';
+ $('#ch').innerHTML=chordLayer(v,r);go(target(v,S.z));
+ const ns=[...new Set(nn.filter(x=>x!=null))].map(x=>N[x]).join(' – ');
+ $('#info').innerHTML=`<div class="meta"><div><span>Chord</span>${nm(r,t)}</div><div><span>Tipe</span>${t=='maj'?'Major':'Minor'}${v.pow?' (power chord, tanpa terts)':''}</div><div><span>Shape</span>${v.lab}</div><div><span>Posisi fret</span>${pos==99?'Open':'Fret '+pos}</div><div><span>Nada akar</span>${N[r]}</div><div><span>Nada chord</span>${ns}</div></div>
+ <div class="st">${v.fr.map((f,s)=>`<div class="${nn[s]==r?'r':''}"><span>${STR[s]}${s==5?' (tinggi)':s==0?' (rendah)':''}</span>${f==null?'✕':N[nn[s]]}<br><small>${f==null?'mute':f==0?'terbuka':'fret '+f+' · jari '+v.fg[s]}</small></div>`).join('')}</div>
+ <div class="ok">✓ Tervalidasi: semua nada milik ${nm(r,t)}, nada bass = akar, tanpa tabrakan jari.${v.bar?' Gantung jari 1 pada fret '+v.bar.fret+'.':''}</div>
+ <div class="foot">Jari: 1 = ${FN[1]}, 2 = ${FN[2]}, 3 = ${FN[3]}, 4 = ${FN[4]}. Lingkaran hijau = nada akar.</div><div class="foot" id="st"></div>`;
+ $('#st').textContent=ST}
+/* self-test seluruh database */
+let tot=0,bad=0;for(const t of['maj','min'])for(let r=0;r<12;r++)for(const v of build(r,t,1)){tot++;if(!validate(v,r,t).ok){bad++;console.warn('voicing ditolak',nm(r,t),v.id)}}
+const ST=`Uji otomatis: ${tot} voicing diperiksa, ${bad} ditolak. Bentuk yang tidak valid/praktis otomatis tidak ditampilkan.`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const d=b.dataset;
+ switch(d.a){case'chip':pick(+d.r,d.t,S.vid);break;case'vid':S.vid=d.v;render();break;case'flt':S.f=d.f;render();break;
+ case'zin':S.z=true;render();break;case'zout':S.z=false;render();break;case'reset':S.z=false;S.q='';$('#q').value='';S.f='all';pick(0,'maj','open');S.z=false;render();break;
+ case'tp':pick((S.r+ +d.d+12)%12,S.t,S.vid);break;
+ case'fav':{const k=key(S.r,S.t);favs.has(k)?favs.delete(k):favs.add(k);try{localStorage.setItem('gce-fav',JSON.stringify([...favs]))}catch(x){}render();break}
+ case'prev':case'next':{const L=list();if(!L.length)break;let i=L.findIndex(([a,c])=>a==S.r&&c==S.t);i=i<0?(d.a=='next'?0:L.length-1):(i+(d.a=='next'?1:-1)+L.length)%L.length;pick(L[i][0],L[i][1],S.vid)}}});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;render()});
+$('#q').addEventListener('keydown',e=>{if(e.key=='Enter'){const L=list();if(L.length)pick(L[0][0],L[0][1],S.vid)}});
+pick(0,'maj','open');
+</script></body></html>
