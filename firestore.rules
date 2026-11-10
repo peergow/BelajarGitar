@@ -1,29 +1,307 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function isTeacher() {
-      return signedIn() && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
-    }
-
-    // dokumen penanda guru: id dokumen = UID akun guru
-    match /teachers/{id} {
-      allow get: if signedIn() && request.auth.uid == id;
-    }
-
-    match /students/{id} {
-      allow read: if signedIn();
-      allow write: if isTeacher();
-      // murid hanya boleh membuat/mengubah dokumennya sendiri, dan tidak boleh mengubah level & bonus XP
-      allow create: if signedIn() && request.auth.uid == id
-        && !('unlocked' in request.resource.data) && !('bonus' in request.resource.data);
-      allow update: if signedIn() && request.auth.uid == id
-        && request.resource.data.get('unlocked', 0) == resource.data.get('unlocked', 0)
-        && request.resource.data.get('bonus', 0) == resource.data.get('bonus', 0);
-    }
-
-    match /homework/{id} { allow read: if signedIn(); allow write: if isTeacher(); }
-    match /levels/{id}   { allow read: if signedIn(); allow write: if isTeacher(); }
-    match /modules/{id}  { allow read: if signedIn(); allow write: if isTeacher(); }
-  }
-}
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les Gitar – Latihan &amp; PR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#fff;--panel:#fff;--line:#e5e5e5;--tx:#3c3c3c;--mut:#777;--acc:#ff9600;--root:#58a700;--on:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131f24;--panel:#1b2a31;--line:#37464f;--tx:#e8f1f5;--mut:#93a8b2;--root:#58cc02;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{max-width:1180px;margin:0 auto;padding:16px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.app{grid-template-columns:340px minmax(0,1fr)}header{grid-column:1/-1}}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0;font-size:22px;letter-spacing:-.01em}h3{margin:16px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+input{background:var(--panel);border:1px solid var(--line);color:var(--tx);padding:10px 14px;border-radius:12px;font:inherit;min-width:min(100%,260px)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.b,.chip,.vr{background:transparent;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;transition:background .2s,border-color .2s}
+.b:hover,.chip:hover,.vr:hover{border-color:var(--acc)}
+.on{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;margin-top:12px;max-height:230px;overflow:auto}
+.chip{padding:7px 4px;text-align:center}
+.vr{display:flex;justify-content:space-between;width:100%;margin-bottom:6px;text-align:left}.vr small{color:inherit;opacity:.7}
+.top,.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.top h2{margin:0;font-size:22px;text-align:center;flex:1}.top h2 small{display:block;font-size:13px;color:var(--mut);font-weight:400}
+.stage{width:min(100%,520px);aspect-ratio:4/5;margin:12px auto;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#1c222c,#0a0d12);border:1px solid var(--line)}
+svg{width:100%;height:100%;display:block}
+.bar{justify-content:center}
+.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.3)}}
+@media(prefers-reduced-motion:reduce){.pop{animation:none}}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:14px}
+.meta div,.st div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.meta span,.st span{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.st{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px;text-align:center}.st div{padding:6px 2px}.st .r{border-color:var(--root);color:var(--root)}
+.ok{color:var(--root);font-size:13px;margin-top:10px}.foot{color:var(--mut);font-size:12px;margin-top:8px}
+.wrap{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:14px}#nav{max-width:900px;margin:0 auto;padding:12px 16px 0}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.g3 div{border:1px solid var(--line);border-radius:12px;padding:10px 4px}.g3 b{display:block;font-size:24px}.g3 span{font-size:11px;color:var(--mut);text-transform:uppercase}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>.grow{flex:1;min-width:0}.bar2{height:10px;border-radius:9px;background:var(--line);overflow:hidden}.bar2 i{display:block;height:100%;background:var(--acc)}
+.cal{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}.cal i{aspect-ratio:1;border-radius:4px;border:1px solid var(--line)}.cal .a{background:var(--root);opacity:.55;border-color:var(--root)}.cal .c{background:var(--root);border-color:var(--root)}
+.it{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;margin-top:8px}.it.me{border-color:var(--acc)}.it.dn{opacity:.55}.it .grow{flex:1;min-width:0}.it small,.mut{color:var(--mut)}.rk{font-size:20px;width:32px;text-align:center}
+textarea,select{background:var(--panel);border:1px solid var(--line);color:var(--tx);padding:10px 14px;border-radius:12px;font:inherit}.warn{color:var(--acc)}h2.s{margin:0 0 4px;font-size:18px}.fm{display:grid;gap:8px}summary{cursor:pointer;padding:4px 0}details a{color:var(--acc)}.lb{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;border-radius:16px;padding:14px 16px;margin:18px 0 12px;font-size:17px}.lb span{font-size:30px}.lbp{width:100%;opacity:.9;margin-top:4px}
+.path{display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0}.nd{text-align:center;max-width:140px}.nd small{display:block;margin-top:6px;color:var(--mut)}
+.node{width:68px;height:68px;border-radius:50%;border:0;font-size:30px;cursor:pointer;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.3);transition:transform .1s}.node:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}.node.dn{background:#ffc800}.node.lk{background:var(--line);box-shadow:0 6px 0 rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center}.node.boss{background:#ffb020}.dt{width:min(100%,420px);text-align:left}
+/* ===== Tampilan ala Duolingo ===== */
+body{font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:700;padding-bottom:92px}
+h1,h2,b{font-weight:900}
+.card{border:2px solid var(--line);border-radius:18px;box-shadow:0 3px 0 var(--line)}
+.b,.chip,.vr{background:var(--panel);border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;font-weight:800}
+.b:active,.chip:active,.vr:active{transform:translateY(2px);border-bottom-width:2px}
+.on{background:#58cc02;border-color:#58a700;color:#fff}
+input,textarea,select{border:2px solid var(--line);font-weight:700}
+.bar2{height:16px}.bar2 i{background:#58cc02;border-radius:9px}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:none;margin:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:2px solid var(--line);display:flex;justify-content:center;gap:4px}
+#nav .b{flex:1;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;font-size:11px;background:transparent;border:2px solid transparent;color:var(--mut)}
+#nav .b span{font-size:24px;line-height:1}
+#nav .b.on{background:rgba(28,176,246,.14);border-color:#84d8ff;color:#1cb0f6}
+.top-stats{position:sticky;top:0;z-index:10;font-size:18px;background:var(--bg)}
+.mascot-row{display:flex;gap:12px;align-items:center}
+.mascot{font-size:56px;line-height:1;animation:wob 2.6s ease-in-out infinite}
+.bubble{flex:1;border:2px solid var(--line);border-radius:16px;padding:10px 14px}
+.login{text-align:center;margin-top:24px}.login .mascot{font-size:72px}
+.lb{border-radius:18px;box-shadow:0 5px 0 rgba(0,0,0,.22);font-weight:900}
+.path{gap:20px;padding:12px 0 26px}.nd{position:relative}
+.node{width:74px;height:74px;box-shadow:0 8px 0 rgba(0,0,0,.28);font-size:32px}
+.node:active{box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.node.cur{box-shadow:0 8px 0 rgba(0,0,0,.28),0 0 0 7px var(--bg),0 0 0 11px var(--line)}
+.go{position:absolute;top:-40px;left:50%;transform:translateX(-50%);background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:3px 12px;color:var(--root);font-weight:900;font-size:13px;letter-spacing:.06em;animation:bob 1.4s ease-in-out infinite}
+.go::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:var(--panel);border:solid var(--line);border-width:0 2px 2px 0;transform:translateX(-50%) rotate(45deg)}
+.dt{background:var(--c);color:#fff;border:0;box-shadow:0 5px 0 rgba(0,0,0,.25);padding:16px}
+.dt small{color:#fff;opacity:.85}.dt .chip{background:rgba(255,255,255,.22);color:#fff;border-color:transparent}
+.dt .b.on{background:#fff;color:var(--c);border-color:rgba(0,0,0,.18)}
+.toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;z-index:50;transform:translateX(-50%);background:#58cc02;color:#fff;border-radius:16px;padding:12px 20px;font-weight:900;box-shadow:0 4px 0 #58a700;animation:pop .4s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
+@keyframes wob{50%{transform:rotate(-8deg) translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.go,.mascot,.toast{animation:none}}
+</style></head><body>
+<nav id="nav" class="seg"></nav><div id="vh"></div><div id="vc" hidden><div class="app">
+<header><h1>🎸 Guitar Chord Explorer</h1><input id="q" placeholder="Cari chord: C, F#m, Bb…" autocomplete="off" aria-label="Cari chord"></header>
+<aside class="card">
+ <div class="seg" id="flt"></div><div class="chips" id="chips"></div>
+ <h3>Variasi bentuk</h3><div id="vars"></div>
+</aside>
+<main class="card">
+ <div class="top"><button class="b" data-a="prev" aria-label="Chord sebelumnya">‹ Sebelumnya</button><h2 id="ttl"></h2><button class="b" data-a="next" aria-label="Chord berikutnya">Berikutnya ›</button></div>
+ <div class="stage"><svg id="svg" viewBox="0 0 10 10"></svg></div>
+ <div class="bar">
+  <button class="b" data-a="zin">Perbesar</button><button class="b" data-a="zout">Perkecil</button><button class="b" data-a="reset">Reset</button>
+  <button class="b" data-a="tp" data-d="-1">Transpose −</button><button class="b" data-a="tp" data-d="1">Transpose +</button><button class="b" data-a="fav" id="fav">☆ Favorit</button>
+ </div>
+ <div id="info"></div>
+</main></div></div>
+<script>
+/* ===== 1. CHORD DATABASE (tuning, nada, chord open) ===== */
+const N=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const OPEN=[4,9,2,7,11,4], STR=['E','A','D','G','B','E'];   // tuning standar E-A-D-G-B-E (low→high)
+const X=null, FN={1:'Telunjuk',2:'Jari tengah',3:'Jari manis',4:'Kelingking'};
+const OPEN_CH={maj:{C:{f:[X,3,2,0,1,0],g:[0,3,2,0,1,0]},D:{f:[X,X,0,2,3,2],g:[0,0,0,1,3,2]},E:{f:[0,2,2,1,0,0],g:[0,2,3,1,0,0]},G:{f:[3,2,0,0,0,3],g:[2,1,0,0,0,3]},A:{f:[X,0,2,2,2,0],g:[0,0,1,2,3,0]}},
+ min:{A:{f:[X,0,2,2,1,0],g:[0,0,2,3,1,0]},D:{f:[X,X,0,2,3,1],g:[0,0,0,2,3,1]},E:{f:[0,2,2,0,0,0],g:[0,2,3,0,0,0]}}};
+/* ===== 2. FINGERING DEFINITIONS (movable shapes; rel = offset dari fret akar) ===== */
+const SH=[
+ {id:'E',lab:'Gantung – E Shape',grp:1,rs:0,bar:[0,5],maj:{r:[0,2,2,1,0,0],g:[1,3,4,2,1,1]},min:{r:[0,2,2,0,0,0],g:[1,3,4,1,1,1]}},
+ {id:'A',lab:'Gantung – A Shape',grp:1,rs:1,bar:[1,5],maj:{r:[X,0,2,2,2,0],g:[0,1,2,3,4,1]},min:{r:[X,0,2,2,1,0],g:[0,1,3,4,2,1]}},
+ {id:'D',lab:'D-Shape Voicing (tanpa gantung penuh)',grp:1,rs:2,maj:{r:[X,X,0,2,3,2],g:[0,0,1,2,4,3]},min:{r:[X,X,0,2,3,1],g:[0,0,1,3,4,2]}},
+ {id:'P6',lab:'Power Chord – akar senar 6',grp:2,rs:0,pow:1,a0:1,maj:{r:[0,2,2,X,X,X],g:[1,3,4,0,0,0]},min:{r:[0,2,2,X,X,X],g:[1,3,4,0,0,0]}},
+ {id:'P5',lab:'Power Chord – akar senar 5',grp:2,rs:1,pow:1,a0:1,maj:{r:[X,0,2,2,X,X],g:[0,1,3,4,0,0]},min:{r:[X,0,2,2,X,X],g:[0,1,3,4,0,0]}},
+ {id:'T',lab:'Alternatif – Triad senar atas',grp:2,rs:3,bar:[3,4],maj:{r:[X,X,X,0,0,3],g:[0,0,0,1,1,4]}}];
+const GRP=['Open Chord','Kunci Gantung & Bentuk Geser (E / A / D)','Voicing Lanjutan'];
+/* ===== validator: setiap voicing diuji terhadap teori musik ===== */
+const notesOf=v=>v.fr.map((f,s)=>f==null?null:(OPEN[s]+f)%12);
+function validate(v,r,t){const n=notesOf(v),s=n.filter(x=>x!=null),th=(r+(t=='maj'?4:3))%12,fi=(r+7)%12,al=v.pow?[r,fi]:[r,th,fi];
+ const fm={};v.fr.forEach((f,i)=>{if(f>0){(fm[v.fg[i]]=fm[v.fg[i]]||new Set()).add(f)}});
+ const fingersOk=v.fr.every((f,i)=>!(f>0)||v.fg[i]>0)&&Object.values(fm).every(z=>z.size==1);
+ return{ok:s.length>=2&&s.every(x=>al.includes(x))&&al.every(a=>s.includes(a))&&s[0]==r&&fingersOk&&v.fr.every(f=>f==null||(f>=0&&f<=15)),n}}
+function build(r,t,raw){const o=[],e=OPEN_CH[t][N[r]];
+ if(e)o.push({id:'open',lab:'Open Position',grp:0,fr:e.f,fg:e.g,sh:'Open'});
+ for(const s of SH){const d=s[t];if(!d)continue;const f=(r-OPEN[s.rs]+12)%12;if(!f&&!s.a0)continue;
+  o.push({id:s.id,lab:s.lab,grp:s.grp,pow:s.pow,fr:d.r.map(x=>x==null?null:x+f),fg:d.g,sh:s.lab,bar:s.bar?{fret:f,from:s.bar[0],to:s.bar[1]}:null})}
+ return raw?o:o.filter(v=>validate(v,r,t).ok)}
+/* ===== 3. FRETBOARD VISUALIZATION (SVG vertikal, skala fret nyata) ===== */
+const $=s=>document.querySelector(s),svg=$('#svg');
+const SP=44,NX=80,Y0=120,SC=1000/(1-2**(-15/12)),CX=NX+2.5*SP;
+const yF=n=>Y0+SC*(1-2**(-n/12)),yc=n=>(yF(n-1)+yF(n))/2,sx=s=>NX+s*SP;
+function board(){const w=5*SP+48,ye=yF(15)+14;let h=`<defs><linearGradient id="wd" x1="0" x2="1"><stop offset="0" stop-color="#3b2517"/><stop offset=".5" stop-color="#4b311f"/><stop offset="1" stop-color="#34200f"/></linearGradient></defs>
+<rect x="${NX-24}" y="14" width="${w}" height="${Y0-14}" rx="18" fill="#22160e" stroke="#000" stroke-opacity=".4"/>
+<rect x="${NX-24}" y="${Y0}" width="${w}" height="${ye-Y0}" fill="url(#wd)"/>`;
+ STR.forEach((n,s)=>h+=`<circle cx="${sx(s)}" cy="62" r="13" fill="#2f2013" stroke="#8b6b3d"/><text x="${sx(s)}" y="67" text-anchor="middle" font-size="14" fill="#e9d9b8">${n}</text>`);
+ for(const n of [3,5,7,9,15])h+=`<circle cx="${CX}" cy="${yc(n)}" r="7" fill="#e6d7b5" opacity=".35"/>`;
+ h+=`<circle cx="${CX-SP}" cy="${yc(12)}" r="7" fill="#e6d7b5" opacity=".35"/><circle cx="${CX+SP}" cy="${yc(12)}" r="7" fill="#e6d7b5" opacity=".35"/>`;
+ for(let n=1;n<=15;n++)h+=`<line x1="${NX-24}" x2="${NX+5*SP+24}" y1="${yF(n)}" y2="${yF(n)}" stroke="#c4c9d1" stroke-width="2.4"/><text x="${NX-34}" y="${yc(n)+5}" text-anchor="end" font-size="14" style="fill:var(--mut)">${n}</text>`;
+ h+=`<rect x="${NX-24}" y="${Y0-6}" width="${w}" height="8" rx="2" fill="#efe6d2"/>`;
+ [3.4,2.8,2.2,1.7,1.3,1].forEach((sw,s)=>h+=`<line x1="${sx(s)}" x2="${sx(s)}" y1="${Y0}" y2="${ye}" stroke="${s<3?'#c9a66b':'#dfe3e9'}" stroke-width="${sw}"/>`);
+ return h+'<g id="ch"></g>'}
+svg.innerHTML=board();
+function chordLayer(v,r){const u=v.fr.filter(f=>f>0),mn=u.length?Math.min(...u):0,my=mn<=3?Y0-20:yc(mn-1);let h='';
+ if(v.bar){const y=yc(v.bar.fret);h+=`<rect class="pop" x="${sx(v.bar.from)-17}" y="${y-17}" width="${sx(v.bar.to)-sx(v.bar.from)+34}" height="34" rx="17" fill="var(--acc)"/><text x="${sx(v.bar.from)}" y="${y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="var(--on)">1</text>`}
+ const nn=notesOf(v);
+ v.fr.forEach((f,s)=>{const x=sx(s);
+  if(f==null)h+=`<text x="${x}" y="${my+6}" text-anchor="middle" font-size="20" font-weight="700" style="fill:var(--mut)">✕</text>`;
+  else if(f==0)h+=`<circle class="pop" cx="${x}" cy="${my}" r="9" fill="none" stroke="${nn[s]==r?'var(--root)':'#e9d9b8'}" stroke-width="3"/>`;
+  else{const inB=v.bar&&f==v.bar.fret&&v.fg[s]==1,y=yc(f),rt=nn[s]==r;
+   if(inB){if(rt)h+=`<circle class="pop" cx="${x}" cy="${y}" r="7" fill="var(--root)" stroke="#fff" stroke-width="2"/>`}
+   else h+=`<circle class="pop" cx="${x}" cy="${y}" r="16" fill="${rt?'var(--root)':'var(--acc)'}" stroke="#0006" stroke-width="1.5"/><text x="${x}" y="${y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="var(--on)">${v.fg[s]}</text>`}});
+ return h}
+/* ===== 4. ZOOM ANIMATION LOGIC (kamera = viewBox, rasio tetap → tidak ada distorsi) ===== */
+const A=.8,H=1140,W=H*A;let cam={x:CX-W/2,y:0,w:W,h:H},raf;
+function target(v,z){if(!z||!v)return{x:CX-W/2,y:0,w:W,h:H};
+ const u=v.fr.filter(f=>f>0),mn=u.length?Math.min(...u):0,mx=u.length?Math.max(...u):1,lo=mn<=3?0:mn-2,hi=Math.min(15,mx+1);
+ let top=lo?yF(lo)-6:Y0-90,bot=yF(hi)+16,h=Math.max(bot-top,400);const mid=(top+bot)/2;top=Math.max(0,mid-h/2);if(top+h>H)top=H-h;
+ return{x:CX-h*A/2,y:top,w:h*A,h}}
+function go(t){cancelAnimationFrame(raf);const a={...cam},t0=performance.now(),ms=matchMedia('(prefers-reduced-motion:reduce)').matches?1:850;
+ (function f(n){let p=Math.min(1,(n-t0)/ms);p=p<.5?4*p*p*p:1-(-2*p+2)**3/2;for(const k of'xywh')cam[k]=a[k]+(t[k]-a[k])*p;
+  svg.setAttribute('viewBox',`${cam.x} ${cam.y} ${cam.w} ${cam.h}`);if(p<1)raf=requestAnimationFrame(f)})(t0)}
+/* ===== 5. CHORD SELECTION INTERFACE ===== */
+const S={r:0,t:'maj',vid:'open',z:true,f:'all',q:''};let favs=new Set;
+try{favs=new Set(JSON.parse(localStorage.getItem('gce-fav')||'[]'))}catch(e){}
+const nm=(r,t)=>N[r]+(t=='min'?'m':''),key=(r,t)=>r+t;
+const norm=q=>q.trim().replace('♯','#').replace(/^([a-g])b/i,(m,l)=>N[(N.indexOf(l.toUpperCase())+11)%12]);
+function list(){const q=norm(S.q).toLowerCase(),o=[];for(const t of['maj','min'])for(let r=0;r<12;r++){
+ if(S.f=='maj'&&t!='maj'||S.f=='min'&&t!='min'||S.f=='fav'&&!favs.has(key(r,t)))continue;
+ if(q&&!nm(r,t).toLowerCase().startsWith(q))continue;o.push([r,t])}return o}
+const vars=()=>build(S.r,S.t),cur=()=>{const L=vars();return L.find(v=>v.id==S.vid)||L[0]};
+function pick(r,t,vid){S.r=r;S.t=t;const L=vars();S.vid=vid&&L.some(v=>v.id==vid)?vid:L[0].id;render()}
+function render(){const v=cur(),L=vars(),r=S.r,t=S.t,nn=notesOf(v),pos=Math.min(...v.fr.filter(f=>f>0),99);
+ $('#flt').innerHTML=[['all','Semua'],['maj','Major'],['min','Minor'],['fav','★ Favorit']].map(([k,l])=>`<button class="b ${S.f==k?'on':''}" data-a="flt" data-f="${k}">${l}</button>`).join('');
+ $('#chips').innerHTML=list().map(([a,b])=>`<button class="chip ${a==r&&b==t?'on':''}" data-a="chip" data-r="${a}" data-t="${b}">${nm(a,b)}</button>`).join('')||'<small style="color:var(--mut)">Tidak ada chord.</small>';
+ $('#vars').innerHTML=GRP.map((g,i)=>{const m=L.filter(x=>x.grp==i);return m.length?`<h3 style="margin-top:10px">${g}</h3>`+m.map(x=>{const u=x.fr.filter(f=>f>0);return`<button class="vr ${x.id==v.id?'on':''}" data-a="vid" data-v="${x.id}"><span>${nm(r,t)} ${x.lab}</span><small>${u.length?'Fret '+Math.min(...u):'Open'}</small></button>`}).join(''):''}).join('');
+ const full=N[r]+(t=='min'?' Minor':' Major');$('#ttl').innerHTML=`${full}<small>${v.lab}</small>`;
+ $('#fav').textContent=favs.has(key(r,t))?'★ Favorit':'☆ Favorit';
+ $('#ch').innerHTML=chordLayer(v,r);go(target(v,S.z));
+ const ns=[...new Set(nn.filter(x=>x!=null))].map(x=>N[x]).join(' – ');
+ $('#info').innerHTML=`<div class="meta"><div><span>Chord</span>${nm(r,t)}</div><div><span>Tipe</span>${t=='maj'?'Major':'Minor'}${v.pow?' (power chord, tanpa terts)':''}</div><div><span>Shape</span>${v.lab}</div><div><span>Posisi fret</span>${pos==99?'Open':'Fret '+pos}</div><div><span>Nada akar</span>${N[r]}</div><div><span>Nada chord</span>${ns}</div></div>
+ <div class="st">${v.fr.map((f,s)=>`<div class="${nn[s]==r?'r':''}"><span>${STR[s]}${s==5?' (tinggi)':s==0?' (rendah)':''}</span>${f==null?'✕':N[nn[s]]}<br><small>${f==null?'mute':f==0?'terbuka':'fret '+f+' · jari '+v.fg[s]}</small></div>`).join('')}</div>
+ <div class="ok">✓ Tervalidasi: semua nada milik ${nm(r,t)}, nada bass = akar, tanpa tabrakan jari.${v.bar?' Gantung jari 1 pada fret '+v.bar.fret+'.':''}</div>
+ <div class="foot">Jari: 1 = ${FN[1]}, 2 = ${FN[2]}, 3 = ${FN[3]}, 4 = ${FN[4]}. Lingkaran hijau = nada akar.</div><div class="foot" id="st"></div>`;
+ $('#st').textContent=ST}
+/* self-test seluruh database */
+let tot=0,bad=0;for(const t of['maj','min'])for(let r=0;r<12;r++)for(const v of build(r,t,1)){tot++;if(!validate(v,r,t).ok){bad++;console.warn('voicing ditolak',nm(r,t),v.id)}}
+const ST=`Uji otomatis: ${tot} voicing diperiksa, ${bad} ditolak. Bentuk yang tidak valid/praktis otomatis tidak ditampilkan.`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const d=b.dataset;
+ switch(d.a){case'chip':pick(+d.r,d.t,S.vid);break;case'vid':S.vid=d.v;render();break;case'flt':S.f=d.f;render();break;
+ case'zin':S.z=true;render();break;case'zout':S.z=false;render();break;case'reset':S.z=false;S.q='';$('#q').value='';S.f='all';pick(0,'maj','open');S.z=false;render();break;
+ case'tp':pick((S.r+ +d.d+12)%12,S.t,S.vid);break;
+ case'fav':{const k=key(S.r,S.t);favs.has(k)?favs.delete(k):favs.add(k);try{localStorage.setItem('gce-fav',JSON.stringify([...favs]))}catch(x){}render();break}
+ case'prev':case'next':{const L=list();if(!L.length)break;let i=L.findIndex(([a,c])=>a==S.r&&c==S.t);i=i<0?(d.a=='next'?0:L.length-1):(i+(d.a=='next'?1:-1)+L.length)%L.length;pick(L[i][0],L[i][1],S.vid)}}});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;render()});
+$('#q').addEventListener('keydown',e=>{if(e.key=='Enter'){const L=list();if(L.length)pick(L[0][0],L[0][1],S.vid)}});
+pick(0,'maj','open');
+</script>
+<script>
+const FIREBASE_CONFIG={
+  apiKey: "AIzaSyCDQoskpwhhTuqi-8Jf-Y1tyQq_lCcKD74",
+  authDomain: "belajar-gitar-cb6bb.firebaseapp.com",
+  projectId: "belajar-gitar-cb6bb",
+  storageBucket: "belajar-gitar-cb6bb.firebasestorage.app",
+  messagingSenderId: "295419384009",
+  appId: "1:295419384009:web:3640281aae0f3a4abe3d18"
+}; // ← tempel config dari Firebase Console
+const DOMAIN='lesgitar.app'; // akhiran email palsu: username "budi" → budi@lesgitar.app
+(async()=>{
+const Q=x=>document.querySelector(x),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dk=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return dk(d)};
+const LV=[[0,'Pemula','🌱'],[100,'Strummer','🎶'],[300,'Chord Hunter','🎯'],[600,'Fingerpicker','🪕'],[1000,'Rockstar','🎸'],[1800,'Legenda','👑']];
+let uname='',db=null,uid=null,teacher=false,tab='home',sd=[],hw=[],ready=false,err='',sort='c';
+const stat=s=>{const L=s.logs||{},ks=Object.keys(L);let st=0,i=L[ago(0)]?0:1;while(L[ago(i)]){st++;i++}
+ let d30=0;for(let j=0;j<30;j++)if(L[ago(j)])d30++;const min=ks.reduce((a,k)=>a+L[k],0),pr=Object.keys(s.done||{}).length,xp=ks.length*10+min+pr*25+(s.mc||0)*5+(s.bonus||0);
+ let l=0;LV.forEach((v,j)=>{if(xp>=v[0])l=j});const n=LV[l+1];return{ul:s.unlocked||0,st,d30,min,pr,xp,l,lv:LV[l],pct:n?Math.round((xp-LV[l][0])/(n[0]-LV[l][0])*100):100,next:n,last:ks.sort().pop()||'-'}};
+const me=()=>sd.find(x=>x.id==uid);
+const rank=()=>sd.filter(x=>x.name).map(x=>({...x,s:stat(x)})).sort((a,b)=>sort=='c'?b.s.d30-a.s.d30||b.s.st-a.s.st||b.s.xp-a.s.xp:b.s.xp-a.s.xp||b.s.d30-a.s.d30);
+const save=async d=>{const i=sd.findIndex(x=>x.id==uid);if(i<0)sd.push({id:uid,...d});else sd[i]={id:uid,...d};R();try{await db.collection('students').doc(uid).set(d)}catch(e){err='Gagal menyimpan: '+e.message;R()}};
+const plain=x=>{const{id,...o}=x;return o};
+const toast=s=>{const e=document.createElement('div');e.className='toast';e.textContent=s;document.body.append(e);setTimeout(()=>e.remove(),1800)};
+function board(){const r=rank();return`<div class="card"><div class="row"><h2 class="s grow">🏆 Peringkat</h2><button class="b ${sort=='c'?'on':''}" data-x="sort" data-v="c">Terkonsisten</button><button class="b ${sort=='x'?'on':''}" data-x="sort" data-v="x">XP total</button></div>
+<p class="mut" style="margin:4px 0 0;font-size:13px">Terkonsisten = jumlah hari latihan dalam 30 hari terakhir (seri: streak, lalu XP).</p>
+${r.map((x,i)=>`<div class="it ${x.id==uid?'me':''}"><div class="rk">${['🥇','🥈','🥉'][i]||i+1}</div><div class="grow"><b>${esc(x.name)}</b> ${x.id==uid?'(kamu)':''}<br><small>${x.s.lv[2]} ${x.s.lv[1]} · ${x.s.xp} XP · Lv ${x.s.ul+1}</small></div><div style="text-align:right"><b>${sort=='c'?x.s.d30+' hari':'🔥 '+x.s.st}</b><br><small>${sort=='c'?'🔥 '+x.s.st+' streak':x.s.d30+' hari/30h'}</small></div></div>`).join('')||'<p class="mut">Belum ada murid yang mulai latihan.</p>'}</div>`}
+const chips=c=>(c||[]).map(x=>`<button class="chip" data-x="ch" data-c="${esc(x)}" style="padding:4px 10px">${esc(x)}</button>`).join(' ');
+function student(){const m=me();if(!m||!m.name)return`<div class="card fm"><h2 class="s">Halo! 👋 Siapa namamu?</h2><input id="nm" placeholder="Nama panggilan" maxlength="24" value="${esc(uname)}"><button class="b on" data-x="join">Mulai</button></div>`;
+ const s=stat(m),L=m.logs||{},my=hw.filter(h=>h.to=='all'||h.to==uid).sort((a,b)=>b.created-a.created),t=L[ago(0)];
+ return`<div class="mascot-row"><div class="mascot">🎸</div><div class="bubble">${t?'Mantap! Kamu sudah latihan hari ini 🔥':'Ayo latihan hari ini, jaga streak-mu!'}</div></div><div class="card"><div class="row"><div class="grow"><h2 class="s">Hai, ${esc(m.name)}!</h2><span>${s.lv[2]} <b>${s.lv[1]}</b> · ${s.xp} XP · Level belajar ${s.ul+1}</span></div></div>
+<div class="bar2" style="margin:10px 0 4px"><i style="width:${s.pct}%"></i></div><small class="mut">${s.next?(s.next[0]-s.xp)+' XP lagi menuju '+s.next[2]+' '+s.next[1]:'Level tertinggi! 👑'}</small></div>
+<div class="g3"><div class="card" style="padding:10px"><b>🔥 ${s.st}</b><span>Streak</span></div><div class="card" style="padding:10px"><b>${s.d30}</b><span>Hari / 30h</span></div><div class="card" style="padding:10px"><b>${s.min}</b><span>Total menit</span></div></div>
+<div class="card fm"><h2 class="s">${t?'✅ Sudah latihan hari ini ('+t+' mnt)':'Latihan hari ini?'}</h2><div class="row"><input id="mn" type="number" min="1" max="240" value="15" style="width:90px"><span class="mut">menit</span><button class="b on grow" data-x="log">${t?'Tambah menit':'Catat latihan'}</button></div>
+<div class="cal">${Array.from({length:28},(_,i)=>{const v=L[ago(27-i)]||0;return`<i class="${v>=15?'c':v?'a':''}" title="${ago(27-i)}: ${v} mnt"></i>`}).join('')}</div></div>
+<div class="card"><h2 class="s">📚 PR kamu</h2>${my.map(h=>{const d=(m.done||{})[h.id],od=h.due&&h.due<ago(0)&&!d;return`<div class="it ${d?'dn':''}"><input type="checkbox" data-x="pr" data-id="${h.id}" ${d?'checked':''} style="width:22px;height:22px"><div class="grow"><b>${esc(h.title)}</b>${h.to!='all'?' <small>(khusus kamu)</small>':''}<br><small>${esc(h.desc)}</small>${h.chords&&h.chords.length?'<br>'+chips(h.chords):''}${h.due?`<br><small class="${od?'warn':'mut'}">Tenggat ${h.due}${od?' – terlambat':''}</small>`:''}</div></div>`}).join('')||'<p class="mut">Belum ada PR. 🎉</p>'}</div>`}
+function guru(){const r=sd.filter(x=>x.name).map(x=>({...x,s:stat(x)})).sort((a,b)=>a.name.localeCompare(b.name));
+ return`<div class="card"><h2 class="s">👩‍🏫 Dashboard guru</h2>${r.map(x=>{const mine=hw.filter(h=>h.to=='all'||h.to==x.id),dn=mine.filter(h=>(x.done||{})[h.id]).length,idle=x.s.last<ago(3);return`<div class="it"><div class="grow"><b>${esc(x.name)}</b> <small>${x.s.lv[2]} ${x.s.lv[1]} · Lv ${x.s.ul+1}</small>${rd(x)}${x.s.ul<L().length-1?`<br><button class="b" data-x="pass" data-id="${x.id}" style="margin-top:4px">✅ Luluskan Level ${x.s.ul+1}</button>`:''}<br><small class="${idle?'warn':'mut'}">Terakhir latihan: ${x.s.last}${idle?' ⚠️':''}</small></div><div style="text-align:right"><b>🔥 ${x.s.st}</b> · ${x.s.d30}/30<br><small>PR ${dn}/${mine.length}</small></div></div>`}).join('')||'<p class="mut">Belum ada murid yang bergabung. Bagikan link halaman ini.</p>'}</div>
+<div class="card fm"><h2 class="s">➕ Beri PR baru</h2><input id="ht" placeholder="Judul PR (mis. Pindah G ke C)"><textarea id="hd" rows="2" placeholder="Keterangan / cara latihan"></textarea><input id="hc" placeholder="Chord, pisah koma (mis. G, C, Am, F#m)"><div class="row"><input id="hu" type="date"><select id="hto" class="grow"><option value="all">Semua murid</option>${r.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></div><button class="b on" data-x="addpr">Kirim PR</button></div>
+<div class="card"><h2 class="s">Daftar PR</h2>${hw.slice().sort((a,b)=>b.created-a.created).map(h=>`<div class="it"><div class="grow"><b>${esc(h.title)}</b> <small>→ ${h.to=='all'?'semua':esc((sd.find(x=>x.id==h.to)||{}).name||'?')}${h.due?' · '+h.due:''}</small><br>${chips(h.chords)}</div><button class="b" data-x="delpr" data-id="${h.id}">Hapus</button></div>`).join('')||'<p class="mut">Belum ada PR.</p>'}</div>`}
+const login=()=>`<div class="card fm login"><div class="mascot">🎸</div><h2 class="s">Les Gitar</h2><p class="mut" style="margin:0">Masuk pakai username & password dari guru.</p><input id="lu" placeholder="Username" autocapitalize="none" autocorrect="off" autocomplete="username"><input id="lp" type="password" placeholder="Password" autocomplete="current-password"><button class="b on" data-x="login">MASUK</button></div>`;
+function R0(){const v=Q('#vh');Q('#nav').innerHTML=[['home','🏠','Beranda'],['learn','📘',teacher?'Modul':'Belajar'],['rank','🏆','Peringkat'],['chords','🎸','Chord']].concat(db?[['out','🚪','Keluar']]:[]).map(([k,i,l])=>`<button class="b ${tab==k?'on':''}" data-x="tab" data-v="${k}"><span>${i}</span>${l}</button>`).join('');
+ Q('#vc').hidden=tab!='chords';v.hidden=tab=='chords';if(tab=='chords')return;
+ v.innerHTML=`<div class="wrap">${err?`<div class="card warn">${esc(err)}</div>`:''}${!ready?'<div class="card">Memuat…</div>':!db?login():tab=='rank'?board():tab=='learn'?(teacher?modt():learn()):teacher?guru():student()}${db?`<small class="mut" style="text-align:center">Masuk: ${esc(uname)} · ${teacher?'GURU':'murid'} · UID ${esc(uid)}</small>`:''}</div>`}
+function showChord(c){c=norm(c.trim());const r=N.indexOf(c.replace(/m$/,''));if(r<0)return;tab='chords';R();pick(r,/m$/.test(c)?'min':'maj','open')}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-x]');if(!b)return;const d=b.dataset,g=i=>Q(i).value;
+ if(d.x=='tab'){if(d.v=='out'){tab='home';auth&&auth.signOut()}else{tab=d.v;R()}}else if(d.x=='sort'){sort=d.v;R()}else if(d.x=='ch')showChord(d.c);
+ else if(d.x=='login'){const u=g('#lu').trim().toLowerCase(),p=g('#lp');if(!u||!p||!auth)return;err='';auth.signInWithEmailAndPassword(u+'@'+DOMAIN,p).catch(()=>{err='Username atau password salah.';R()})}
+ else if(d.x=='join'){const n=g('#nm').trim();if(n)save({name:n,logs:{},done:{}})}
+ else if(d.x=='log'){const m=plain(me()),n=Math.max(1,Math.min(240,+g('#mn')||15));m.logs={...m.logs,[ago(0)]:(m.logs[ago(0)]||0)+n};save(m);toast('🔥 Latihan tercatat!')}
+ else if(d.x=='addpr'){const t=g('#ht').trim();if(!t)return;try{await db.collection('homework').add({title:t,desc:g('#hd').trim(),chords:g('#hc').split(',').map(x=>x.trim()).filter(Boolean),due:g('#hu'),to:g('#hto'),created:Date.now()})}catch(x){err=x.message;R()}}
+ else if(d.x=='delpr'){try{await db.collection('homework').doc(d.id).delete()}catch(x){err=x.message;R()}}});
+document.addEventListener('change',e=>{const b=e.target.closest('[data-x=pr]');if(!b)return;const m=plain(me()),o={...m.done};b.checked?o[b.dataset.id]=1:delete o[b.dataset.id];m.done=o;save(m)});
+let sel='',lvs=[],mods=[],ed=null,fail=0,lock=0,cmsg='',hold=false;
+function R(){if(hold)return;R0()}
+document.addEventListener('focusin',e=>{if(Q('#vh').contains(e.target)&&e.target.matches('input:not([type=checkbox]),textarea,select'))hold=true});
+document.addEventListener('focusout',()=>{hold=false});
+document.addEventListener('click',()=>{hold=false},true);
+const sh=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+const L=()=>lvs.slice().sort((a,b)=>a.order-b.order),ML=l=>mods.filter(m=>m.level==l).sort((a,b)=>a.order-b.order);
+const rd=x=>{const n=L().filter(l=>(x.ready||{})[l.id]).map(l=>esc(l.name));return n.length?`<br><small class="warn">🙋 Siap tes: ${n.join(', ')}</small>`:''};
+const vid=u=>/^https?:\/\//.test(u||'')?`<br><a href="${esc(u)}" target="_blank" rel="noopener">▶ Video</a>`:'';
+const mcard=(x,m)=>{const dn=(m.mods||{})[x.id]==ago(0);return`<div class="it ${dn?'dn':''}"><input type="checkbox" data-x="md" data-id="${x.id}" ${dn?'checked':''} style="width:22px;height:22px"><div class="grow"><b>${esc(x.title)}</b>${x.min?` <small>· ${x.min} mnt</small>`:''}<br><small style="white-space:pre-wrap">${esc(x.body)}</small>${x.target?`<br>🎯 ${esc(x.target)}`:''}${x.chords&&x.chords.length?'<br>'+chips(x.chords):''}${vid(x.video)}</div></div>`};
+const PAL=['#58cc02','#1cb0f6','#ce82ff','#ff9600','#ff4b4b'],TH=['🌲','⛰️','🏝️','🌋','🏰'],OF=[0,46,70,46,0,-46,-70,-46];
+function learn(){const m=me();if(!m||!m.name)return student();const ls=L(),u=Math.min(m.unlocked||0,Math.max(ls.length-1,0)),s=stat(m);
+ if(!ls.length)return'<div class="card mut">Guru belum membuat level. Sabar ya! 🎸</div>';
+ return`<div class="card row top-stats"><b class="grow">🔥 ${s.st} hari</b><b>${s.lv[2]} ${s.xp} XP</b></div>`+ls.map((l,i)=>{const c=PAL[i%5],ms=ML(l.id).filter(x=>x.pub),lock=i>u,dn=ms.filter(x=>(m.mods||{})[x.id]==ago(0)).length;
+ const bn=`<div class="lb" style="background:${lock?'var(--line)':c};color:${lock?'var(--mut)':'#fff'}"><div><small>LEVEL ${i+1}${i<u?' · LULUS ✅':''}</small><br><b>${esc(l.name)}</b></div><span>${lock?'🔒':TH[i%5]}</span>${lock?'':`<small class="lbp">${dn}/${ms.length} modul hari ini</small>`}</div>`;
+ if(lock)return bn+`<div class="path">${[0,1,2].map(k=>`<div class="nd" style="transform:translateX(${OF[k]}px)"><div class="node lk">🔒</div></div>`).join('')}</div>`;
+ let h=bn+'<div class="path">';
+ const cur=ms.find(y=>(m.mods||{})[y.id]!=ago(0));ms.forEach((x,k)=>{const d=(m.mods||{})[x.id]==ago(0);
+  h+=`<div class="nd" style="transform:translateX(${OF[k%8]}px)">${x===cur?'<div class="go">MULAI</div>':''}<button class="node ${d?'dn':''} ${x===cur?'cur':''}" style="${d?'':'background:'+c}" data-x="nd" data-id="${x.id}">${d?'⭐':'🎸'}</button><small>${esc(x.title)}</small></div>`;
+  if(sel==x.id)h+=`<div class="dt card" style="--c:${c}"><b>${esc(x.title)}</b>${x.min?` <small>· ${x.min} mnt</small>`:''}<br><span style="white-space:pre-wrap">${esc(x.body)}</span>${x.target?`<br>🎯 ${esc(x.target)}`:''}${x.chords&&x.chords.length?'<br>'+chips(x.chords):''}${vid(x.video)}<br><button class="b on" style="margin-top:8px;width:100%" data-x="md" data-id="${x.id}">${d?'↩ Batalkan':'✅ Selesai latihan hari ini'}</button></div>`});
+ if(!ms.length)h+='<p class="mut">Belum ada modul di level ini.</p>';
+ if(i==u&&i<ls.length-1){const b='b'+l.id,rr=(m.ready||{})[l.id];
+  h+=`<div class="nd" style="transform:translateX(${OF[ms.length%8]}px)"><button class="node boss" data-x="nd" data-id="${b}">🏆</button><small>Tes Sabtu</small></div>`;
+  if(sel==b)h+=`<div class="dt card" style="--c:${c}"><b>🏆 Tes naik level</b><p>Sudah lancar? Beri tahu guru, lalu tes langsung di pertemuan Sabtu.</p><button class="b ${rr?'on':''}" style="width:100%" data-x="rdy" data-id="${l.id}">${rr?'🙋 Siap tes (batalkan)':'🙋 Saya siap tes'}</button><small class="mut">Guru yang akan menguji dan membuka level berikutnya.</small></div>`}
+ else if(i==u)h+='<div class="nd"><div class="node boss">👑</div><small>Level terakhir!</small></div>';
+ return h+'</div>'}).join('')}
+function modt(){const ls=L(),e=ed&&mods.find(x=>x.id==ed)||{};
+ return`<div class="card fm"><h2 class="s">➕ ${ed?'Ubah':'Tambah'} modul</h2>${ls.length?`<select id="ml">${ls.map((l,i)=>`<option value="${l.id}" ${e.level==l.id?'selected':''}>Level ${i+1} – ${esc(l.name)}</option>`).join('')}</select><input id="mt" placeholder="Judul modul" value="${esc(e.title)}"><textarea id="mb" rows="4" placeholder="Penjelasan / cara latihan">${esc(e.body)}</textarea><input id="mc" placeholder="Chord, pisah koma" value="${esc((e.chords||[]).join(', '))}"><input id="mg" placeholder="Target (mis. pindah Em–Am 10x)" value="${esc(e.target)}"><input id="mv" placeholder="Tautan video (opsional)" value="${esc(e.video)}"><div class="row"><input id="mm" type="number" placeholder="Menit" value="${esc(e.min)}" style="width:100px"><label class="grow"><input type="checkbox" id="mp" ${e.pub?'checked':''} style="min-width:0"> Publikasikan</label></div><div class="row"><button class="b on grow" data-x="svm">Simpan</button>${ed?'<button class="b" data-x="cxl">Batal</button>':''}</div>`:'<p class="mut">Buat level dulu di bawah.</p>'}</div>
+ <div class="card fm"><h2 class="s">📘 Level</h2><div class="row"><input id="ln" placeholder="Nama level baru (mis. Dasar)" class="grow"><button class="b on" data-x="addl">Tambah level</button></div>${err?`<small class="warn">${esc(err)}</small>`:''}</div>
+ ${ls.map((l,i)=>`<div class="card"><div class="row"><b class="grow">Level ${i+1} – ${esc(l.name)}</b><button class="b" data-x="lup" data-id="${l.id}">▲</button><button class="b" data-x="ldn" data-id="${l.id}">▼</button><button class="b" data-x="dell" data-id="${l.id}">Hapus</button></div>
+ 
+ ${ML(l.id).map(x=>`<div class="it ${x.pub?'':'dn'}"><div class="grow"><b>${esc(x.title)}</b> <small>${x.pub?'':'(draf)'}</small></div><button class="b" data-x="mup" data-id="${x.id}">▲</button><button class="b" data-x="mdn" data-id="${x.id}">▼</button><button class="b" data-x="med" data-id="${x.id}">Ubah</button><button class="b" data-x="mdup" data-id="${x.id}">Salin</button><button class="b" data-x="mdel" data-id="${x.id}">✕</button></div>`).join('')||'<p class="mut">Belum ada modul.</p>'}</div>`).join('')}`}
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.id=='lp')Q('[data-x=login]').click()});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-x]');if(!b||!db)return;const d=b.dataset,g=i=>Q(i).value,C=n=>db.collection(n),fx=async f=>{try{await f()}catch(x){err=x.message;R()}};
+ switch(d.x){
+ case'addl':{const n=g('#ln').trim();if(n)fx(()=>C('levels').add({name:n,order:Date.now(),hash:''}));break}
+ case'code':{const c=g('#k'+d.id).trim().toLowerCase();if(c.length<4){err='Kode minimal 4 karakter (disarankan 8+).';R();break}fx(async()=>{await C('levels').doc(d.id).update({hash:await sh(d.id+c)});err='✅ Kode level disimpan.';R()});break}
+ case'lup':case'ldn':case'mup':case'mdn':{const isL=d.x[0]=='l',arr=isL?L():ML(mods.find(x=>x.id==d.id).level),i=arr.findIndex(x=>x.id==d.id),j=i+(d.x.endsWith('up')?-1:1);if(j<0||j>=arr.length)break;const col=isL?'levels':'modules';fx(async()=>{await C(col).doc(arr[i].id).update({order:arr[j].order});await C(col).doc(arr[j].id).update({order:arr[i].order})});break}
+ case'dell':if(confirm('Hapus level ini beserta modulnya?'))fx(async()=>{for(const m of ML(d.id))await C('modules').doc(m.id).delete();await C('levels').doc(d.id).delete()});break;
+ case'med':ed=d.id;R();break;case'cxl':ed=null;R();break;
+ case'mdel':if(confirm('Hapus modul ini?'))fx(()=>C('modules').doc(d.id).delete());break;
+ case'mdup':{const m=plain(mods.find(x=>x.id==d.id));fx(()=>C('modules').add({...m,title:m.title+' (salinan)',pub:false,order:Date.now()}));break}
+ case'svm':{const t=g('#mt').trim();if(!t)break;const o={level:g('#ml'),title:t,body:g('#mb').trim(),chords:g('#mc').split(',').map(x=>x.trim()).filter(Boolean),target:g('#mg').trim(),video:g('#mv').trim(),min:+g('#mm')||0,pub:Q('#mp').checked},id=ed;ed=null;fx(async()=>{id?await C('modules').doc(id).update(o):await C('modules').add({...o,order:Date.now()});R()});break}
+ case'nd':sel=sel==d.id?'':d.id;R();break;
+ case'pass':{const s=sd.find(x=>x.id==d.id),l=s&&L()[s.unlocked||0];if(!l)break;const r={...s.ready};delete r[l.id];fx(()=>C('students').doc(s.id).update({unlocked:(s.unlocked||0)+1,bonus:(s.bonus||0)+50,ready:r}));break}
+ case'md':{const m=plain(me()),mm={...m.mods};if(mm[d.id]==ago(0)){delete mm[d.id];m.mc=Math.max(0,(m.mc||0)-1)}else{mm[d.id]=ago(0);m.mc=(m.mc||0)+1;sel='';toast('🎉 Selesai! +5 XP')}m.mods=mm;save(m);break}
+ case'rdy':{const m=plain(me()),r={...m.ready};r[d.id]?delete r[d.id]:r[d.id]=1;m.ready=r;save(m);break}
+ case'unl':{if(Date.now()<lock){cmsg='Tunggu sebentar…';R();break}const c=Q('#cd'+d.id).value.trim().toLowerCase(),l=lvs.find(x=>x.id==d.id);if(l&&l.hash&&await sh(d.id+c)==l.hash){fail=0;const m=plain(me()),r={...m.ready};delete r[d.id];m.ready=r;m.unlocked=(m.unlocked||0)+1;m.bonus=(m.bonus||0)+50;cmsg='';save(m)}else{if(++fail>=3){lock=Date.now()+10000;fail=0}cmsg=l&&l.hash?'Kode salah.':'Guru belum mengatur kode.';R()}break}
+ }});
+R();
+const cfgOk=!/^ISI/.test(FIREBASE_CONFIG.apiKey);let auth=null,un=[];
+if(!cfgOk){err='Firebase belum diatur: isi FIREBASE_CONFIG di bagian atas script.';ready=true;R()}
+else{firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();const fs=firebase.firestore();
+ auth.onAuthStateChanged(async u=>{un.forEach(f=>f());un=[];sd=[];hw=[];lvs=[];mods=[];teacher=false;tab='home';sel='';
+  if(!u){db=null;uid=null;ready=true;R();return}
+  uid=u.uid;const s=(u.email||'').split('@')[0];uname=s.charAt(0).toUpperCase()+s.slice(1);
+  let te='';try{teacher=(await fs.collection('teachers').doc(uid).get()).exists}catch(e){teacher=false;te='Gagal cek peran guru: '+e.message}
+  db=fs;ready=true;err=te;R();
+  const f=e=>{err='Gagal memuat: '+e.message;R()},w=(n,set)=>un.push(db.collection(n).onSnapshot(q=>{set(q.docs.map(d=>({id:d.id,...d.data()})));R()},f));
+  w('students',x=>sd=x);w('homework',x=>hw=x);w('levels',x=>lvs=x);w('modules',x=>mods=x)})}
+})();
+</script></body></html>
