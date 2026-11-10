@@ -192,7 +192,14 @@ $('#q').addEventListener('keydown',e=>{if(e.key=='Enter'){const L=list();if(L.le
 pick(0,'maj','open');
 </script>
 <script>
-const FIREBASE_CONFIG={apiKey:"ISI_API_KEY",authDomain:"ISI.firebaseapp.com",projectId:"ISI",appId:"ISI"}; // ← tempel config dari Firebase Console
+const FIREBASE_CONFIG={
+  apiKey: "AIzaSyCDQoskpwhhTuqi-8Jf-Y1tyQq_lCcKD74",
+  authDomain: "belajar-gitar-cb6bb.firebaseapp.com",
+  projectId: "belajar-gitar-cb6bb",
+  storageBucket: "belajar-gitar-cb6bb.firebasestorage.app",
+  messagingSenderId: "295419384009",
+  appId: "1:295419384009:web:3640281aae0f3a4abe3d18"
+}; // ← tempel config dari Firebase Console
 const DOMAIN='lesgitar.app'; // akhiran email palsu: username "budi" → budi@lesgitar.app
 (async()=>{
 const Q=x=>document.querySelector(x),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
