@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isTeacher() {
+      return signedIn() && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
+    }
+
+    // dokumen penanda guru: id dokumen = UID akun guru
+    match /teachers/{id} {
+      allow get: if signedIn() && request.auth.uid == id;
+    }
+
+    match /students/{id} {
+      allow read: if signedIn();
+      allow write: if isTeacher();
+      // murid hanya boleh membuat/mengubah dokumennya sendiri, dan tidak boleh mengubah level & bonus XP
+      allow create: if signedIn() && request.auth.uid == id
+        && !('unlocked' in request.resource.data) && !('bonus' in request.resource.data);
+      allow update: if signedIn() && request.auth.uid == id
+        && request.resource.data.get('unlocked', 0) == resource.data.get('unlocked', 0)
+        && request.resource.data.get('bonus', 0) == resource.data.get('bonus', 0);
+    }
+
+    match /homework/{id} { allow read: if signedIn(); allow write: if isTeacher(); }
+    match /levels/{id}   { allow read: if signedIn(); allow write: if isTeacher(); }
+    match /modules/{id}  { allow read: if signedIn(); allow write: if isTeacher(); }
+  }
+}
