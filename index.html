@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Les Gitar – Latihan &amp; PR</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<title>STREET CHORDS – Play. Learn. Level Up.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -82,9 +82,87 @@ input,textarea,select{border:2px solid var(--line);font-weight:700}
 @keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
 @keyframes wob{50%{transform:rotate(-8deg) translateY(-3px)}}
 @media(prefers-reduced-motion:reduce){.go,.mascot,.toast{animation:none}}
+/* ===== STREET CHORDS — neo-street theme (cream, ink borders, hard shadows) ===== */
+:root{--ink:#20242c;--cream:#f7f4e9;--orange:#ff6b35;--teal:#38d6c3;--blue:#3265ed;--yellow:#ffdc49;--acc:#ff6b35;--root:#12a595;--bg:#f7f4e9;--panel:#fff;--line:#20242c;--tx:#20242c;--mut:#697078;--on:#fff;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#f7f4e9;--panel:#fff;--line:#20242c;--tx:#20242c;--mut:#697078;--root:#12a595;color-scheme:light}}
+body{font-family:"DM Sans",system-ui,sans-serif;font-weight:700;background:var(--cream);color:var(--ink);padding-bottom:96px}
+h1,h2,h3,.s,.brand,.rk,.g3 b{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.3px}
+h2.s{font-size:28px;line-height:1}.g3 b{font-size:30px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:4px solid var(--blue);outline-offset:2px}
+.card{background:#fff;border:2px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink)}
+.b,.chip,.vr{background:#fff;color:var(--ink);border:2px solid var(--ink);border-bottom-width:2px;border-radius:13px;box-shadow:3px 3px 0 var(--ink);font-weight:900;transition:transform .15s,box-shadow .15s}
+.b:hover,.chip:hover,.vr:hover{border-color:var(--ink);transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
+.b:active,.chip:active,.vr:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink);border-bottom-width:2px}
+.on{background:var(--yellow);color:var(--ink);border-color:var(--ink)}.b.on{text-transform:uppercase}
+.b:disabled{opacity:.5;cursor:not-allowed;transform:none}
+input,textarea,select{border:2px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);font-weight:700}
+.bar2{height:14px;border:2px solid var(--ink);border-radius:20px;background:#fff}.bar2 i{background:var(--orange);border-radius:0;transition:width .3s}
+.it{border:2px solid var(--ink);border-radius:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);margin-top:10px}.it.me{background:#fff2ab;border-color:var(--ink)}
+.cal i{border:2px solid var(--ink);border-radius:5px}.cal .a{background:var(--teal);opacity:.6}.cal .c{background:var(--teal)}
+.warn{color:#c2410c}.ok{color:#0e7a6e}
+.toast{background:var(--ink);color:#fff;border:2px solid #fff;box-shadow:4px 4px 0 var(--orange);border-radius:12px;top:auto;bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+/* hero */
+.hero{background:var(--teal);border:3px solid var(--ink);border-radius:26px;box-shadow:7px 7px 0 var(--ink);display:grid;grid-template-columns:1.1fr .9fr;overflow:hidden;position:relative;min-height:290px}
+.hero:before{content:"";position:absolute;width:260px;height:260px;border:30px solid #ffffff55;border-radius:50%;right:5%;top:-85px}
+.hero-copy{padding:26px 0 26px 28px;z-index:1}.eyebrow{font:900 12px "DM Sans",sans-serif;letter-spacing:2px;text-transform:uppercase;color:#173b39}
+.hero h1{font-size:clamp(44px,8vw,70px);line-height:.88;margin:6px 0 10px}.hero p{max-width:330px;font-weight:700;font-size:14px}
+.hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.mascot-wrap{position:relative;display:flex;align-items:end;justify-content:center;min-height:240px}
+.mascot{animation:none;font-size:0;filter:drop-shadow(7px 8px 0 #20242c33);z-index:1}.mascot svg{width:min(100%,270px);height:auto}
+.login .mascot svg{width:150px}.hero .mascot svg{width:230px;max-width:none}
+.burst{position:absolute;top:18px;right:12px;background:var(--yellow);border:2px solid var(--ink);border-radius:50%;width:66px;height:66px;display:grid;place-items:center;font:900 20px "Barlow Condensed",sans-serif;transform:rotate(15deg);z-index:2}
+.brand{margin:0;font-size:38px;line-height:.9;color:#fff;text-shadow:3px 3px 0 var(--orange);transform:rotate(-3deg);display:inline-block}
+.login .brand{color:var(--ink);text-shadow:3px 3px 0 var(--yellow)}
+/* level map */
+.lb{border:3px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink);font-family:"Barlow Condensed",sans-serif;text-transform:uppercase}.lb b{font-size:26px}
+.node{border:3px solid var(--ink);box-shadow:4px 5px 0 var(--ink);color:var(--ink);background:#fff}.node:active{box-shadow:0 0 0 var(--ink);transform:translate(4px,5px)}
+.node.dn{background:var(--yellow)}.node.lk{background:#d5d9db;box-shadow:4px 5px 0 var(--ink)}.node.boss{background:var(--orange)}
+.node.cur{box-shadow:4px 5px 0 var(--ink),0 0 0 6px var(--cream),0 0 0 9px var(--ink)}
+.go{background:var(--yellow);border:2px solid var(--ink);color:var(--ink);font-family:"Barlow Condensed",sans-serif;font-size:16px}.go::after{background:var(--yellow);border-color:var(--ink)}
+.dt,.mdl{border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);border-radius:22px}.mdl{background:#fff;border-top:12px solid var(--c)}
+.stt{border:2px solid var(--ink);border-radius:12px}.stt.ap{background:var(--teal);color:var(--ink)}.stt.rq{background:var(--yellow);color:var(--ink)}
+/* nav: mobile bottom bar, desktop sidebar */
+#nav{background:var(--ink);border-top:3px solid var(--orange);gap:2px}
+#nav .b{background:none;border:0;box-shadow:none;color:#c7cbce;font-size:10px;font-weight:900;text-transform:none}
+#nav .b.on{background:none;color:var(--yellow);border:0}#nav .b:hover{transform:none;box-shadow:none}
+@media(min-width:761px){body{padding-left:225px;padding-bottom:24px}
+ #nav{right:auto;top:0;width:225px;flex-direction:column;justify-content:flex-start;padding:30px 14px;gap:8px;border-top:0;border-right:3px solid var(--orange);overflow:auto}
+ #nav:before{content:"STREET CHORDS";display:block;color:#fff;font:900 34px/.85 "Barlow Condensed",sans-serif;text-shadow:3px 3px 0 var(--orange);transform:rotate(-3deg);margin:0 0 26px 6px}
+ #nav .b{flex:none;max-width:none;width:100%;flex-direction:row;gap:14px;font-size:14px;padding:12px 14px;border-radius:16px;justify-content:flex-start}
+ #nav .b.on{background:var(--yellow);color:var(--ink);box-shadow:4px 4px 0 #000}}
+/* chord explorer */
+.stage{border:3px solid var(--ink);border-radius:20px;box-shadow:4px 4px 0 var(--ink)}.top h2 small{color:var(--mut)}
+.meta div,.st div{border:2px solid var(--ink);border-radius:12px;background:#fff}.st .r{background:var(--teal);color:var(--ink);border-color:var(--ink)}
+/* fitur baru */
+.g4{grid-template-columns:repeat(4,1fr)}.g4 .card{padding:8px 2px;box-shadow:3px 3px 0 var(--ink)}
+.g3>div,.g3>.card{border:2px solid var(--ink);border-radius:14px}
+.mi{display:flex;gap:10px;align-items:center;padding:8px 0}.mi small{display:block}
+.acs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.ac{border:2px solid var(--ink);border-radius:14px;padding:10px;text-align:center;background:#fff}.ac.on2{background:var(--yellow);box-shadow:3px 3px 0 var(--ink)}.ac:not(.on2){opacity:.55;filter:grayscale(1)}.ac span{font-size:30px;display:block}
+.beats{display:flex;gap:8px;justify-content:center}.bd{width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--ink)}.bd.lit{background:var(--orange)}
+.bpmv{font:900 52px "Barlow Condensed",sans-serif;text-align:center}
+input[type=range]{width:100%;min-width:0;padding:0;border:0;accent-color:var(--orange)}
+@media(max-width:760px){.hero{grid-template-columns:1fr 135px;min-height:270px}.hero-copy{padding:22px 0 20px 18px}.hero h1{font-size:46px}.hero p{font-size:12px}.hero .mascot svg{width:190px;transform:translateX(-30px)}.burst{width:52px;height:52px;font-size:16px;right:4px;top:12px}.hero .b.on+.b{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* peta zona & token pemain */
+.lb{scroll-margin-top:64px}
+.zpath{display:grid;gap:14px;padding:16px 0 6px;background:linear-gradient(var(--ink) 50%,transparent 0) center/4px 18px repeat-y}
+.zn{display:flex;align-items:center;gap:10px;width:min(100%,260px);margin:0 auto;background:var(--c);color:#fff;border:3px solid var(--ink);border-radius:18px;padding:10px 12px;box-shadow:4px 5px 0 var(--ink);text-align:left;font:inherit;cursor:pointer;position:relative}
+.zn:active{box-shadow:0 0 0 var(--ink);margin-top:5px}.zn.lk{background:#d5d9db;color:var(--mut)}.zn.cur{outline:4px solid var(--yellow);outline-offset:2px}
+.zi{font-size:26px}.zt{flex:1;min-width:0}.zt b{display:block;font:900 20px/1 "Barlow Condensed",sans-serif;text-transform:uppercase}.zt small{font-size:11px}
+.zk{display:flex;flex-wrap:wrap;max-width:76px;justify-content:flex-end;padding-left:6px}
+.zd{width:24px;height:24px;border-radius:50%;background:var(--j);border:2px solid var(--ink);color:var(--ink);font:900 11px/20px "DM Sans",sans-serif;text-align:center;font-style:normal;margin-left:-6px}
+.zd.me{outline:3px solid var(--yellow);z-index:1}
+.tk{display:block;width:46px;position:relative}.tk svg{width:100%;height:auto;display:block;filter:none}
+.tk.me{width:54px;margin:0 auto -18px;z-index:3;animation:bob2 1.4s ease-in-out infinite}
+.tk.me b{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--yellow);border:2px solid var(--ink);border-radius:8px;font:900 10px "DM Sans",sans-serif;padding:0 5px}
+.tks{display:flex;justify-content:center;flex-wrap:wrap;margin-top:6px}.tks .tk{width:32px;margin:0 -3px}
+.tk em{display:block;font:800 9px/1.2 "DM Sans",sans-serif;text-align:center;font-style:normal;background:#fff;border:1.5px solid var(--ink);border-radius:6px;margin-top:-2px;overflow:hidden}
+@keyframes bob2{50%{transform:translateY(-5px)}}
 </style></head><body>
 <nav id="nav" class="seg"></nav><div id="vh"></div><div id="vc" hidden><div class="app">
-<header><h1>🎸 Guitar Chord Explorer</h1><input id="q" placeholder="Cari chord: C, F#m, Bb…" autocomplete="off" aria-label="Cari chord"></header>
+<header><h1>🎸 Chord Explorer</h1><input id="q" placeholder="Cari chord: C, F#m, Bb…" autocomplete="off" aria-label="Cari chord"></header>
 <aside class="card">
  <div class="seg" id="flt"></div><div class="chips" id="chips"></div>
  <h3>Variasi bentuk</h3><div id="vars"></div>
@@ -208,15 +286,15 @@ const FIREBASE_CONFIG={
 const DOMAIN='lesgitar.app'; // akhiran email palsu: username "budi" → budi@lesgitar.app
 (async()=>{
 const Q=x=>document.querySelector(x),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const dk=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return dk(d)};
+const dk=d=>d.toLocaleDateString('en-CA',{timeZone:'Asia/Jakarta'}),ago=n=>dk(new Date(Date.now()-n*864e5));
 const LV=[[0,'Pemula','🌱'],[400,'Strummer','🎶'],[1300,'Chord Hunter','🎯'],[3000,'Fingerpicker','🪕'],[6000,'Rockstar','🎸'],[10000,'Legenda','👑']];
 let uname='',db=null,uid=null,teacher=false,tab='home',sd=[],hw=[],ready=false,err='',sort='c';
 const stat=s=>{const L=s.logs||{},ks=Object.keys(L);let st=0,i=L[ago(0)]?0:1;while(L[ago(i)]){st++;i++}
- let d30=0;for(let j=0;j<30;j++)if(L[ago(j)])d30++;const min=ks.reduce((a,k)=>a+L[k],0),pr=Object.keys(s.done||{}).length,xp=ks.length*10+min+pr*25+(s.mc||0)*5+(s.bonus||0);
+ let d30=0;for(let j=0;j<30;j++)if(L[ago(j)])d30++;const min=ks.reduce((a,k)=>a+L[k],0),pr=Object.keys(s.done||{}).length,xp=ks.length*10+min+pr*25+(s.mc||0)*5+(s.bonus||0)+(s.mxp||0);
  let l=0;LV.forEach((v,j)=>{if(xp>=v[0])l=j});const n=LV[l+1];return{ul:s.unlocked||0,st,d30,min,pr,xp,l,lv:LV[l],pct:n?Math.round((xp-LV[l][0])/(n[0]-LV[l][0])*100):100,next:n,last:ks.sort().pop()||'-'}};
 const me=()=>sd.find(x=>x.id==uid);
 const rank=()=>sd.filter(x=>x.name).map(x=>({...x,s:stat(x)})).sort((a,b)=>sort=='c'?b.s.d30-a.s.d30||b.s.st-a.s.st||b.s.xp-a.s.xp:b.s.xp-a.s.xp||b.s.d30-a.s.d30);
-const save=async d=>{const i=sd.findIndex(x=>x.id==uid);if(i<0)sd.push({id:uid,...d});else sd[i]={id:uid,...d};R();try{await db.collection('students').doc(uid).set(d)}catch(e){err='Gagal menyimpan: '+e.message;R()}};
+const save=async d=>{const i=sd.findIndex(x=>x.id==uid),ex=i>=0;if(i<0)sd.push({id:uid,...d});else sd[i]={id:uid,...d};R();try{const rf=db.collection('students').doc(uid);if(ex&&!teacher){const o={...d};['unlocked','appr','bonus'].forEach(k=>delete o[k]);await rf.update(o)}else await rf.set(d)}catch(e){err='Gagal menyimpan: '+e.message;R()}};
 const plain=x=>{const{id,...o}=x;return o};
 const toast=s=>{const e=document.createElement('div');e.className='toast';e.textContent=s;document.body.append(e);setTimeout(()=>e.remove(),1800)};
 function board(){const r=rank();return`<div class="card"><div class="row"><h2 class="s grow">🏆 Peringkat</h2><button class="b ${sort=='c'?'on':''}" data-x="sort" data-v="c">Terkonsisten</button><button class="b ${sort=='x'?'on':''}" data-x="sort" data-v="x">XP total</button></div>
@@ -226,25 +304,25 @@ const fmt=s=>esc(s).replace(/\*\*([^\n]+?)\*\*/g,'<b>$1</b>').replace(/\*([^*\n]
 const chips=c=>(c||[]).map(x=>`<button class="chip" data-x="ch" data-c="${esc(x)}" style="padding:4px 10px">${esc(x)}</button>`).join(' ');
 function student(){const m=me();if(!m||!m.name)return`<div class="card fm"><h2 class="s">Halo! 👋 Siapa namamu?</h2><input id="nm" placeholder="Nama panggilan" maxlength="24" value="${esc(uname)}"><button class="b on" data-x="join">Mulai</button></div>`;
  const s=stat(m),L=m.logs||{},my=hw.filter(h=>h.to=='all'||h.to==uid).sort((a,b)=>b.created-a.created),t=L[ago(0)];
- return`<div class="mascot-row"><div class="mascot">🎸</div><div class="bubble">${t?'Mantap! Kamu sudah latihan hari ini 🔥':'Ayo latihan hari ini, jaga streak-mu!'}</div></div><div class="card"><div class="row"><div class="grow"><h2 class="s">Hai, ${esc(m.name)}!</h2><span>${s.lv[2]} <b>${s.lv[1]}</b> · ${s.xp} XP · Level belajar ${s.ul+1}</span></div></div>
+ return`<div class="hero"><div class="hero-copy"><div class="eyebrow">Season 01 · ${s.lv[1]}</div><h1>${t?'Mantap!':'Ayo main!'}</h1><p>${t?'Kamu sudah latihan hari ini. Jaga terus streak-mu!':'Latihan sedikit tiap hari bikin permainanmu makin keras.'}</p><div class="hero-actions"><button class="b on" data-x="tab" data-v="learn">Lanjutkan belajar</button><button class="b" data-x="tab" data-v="play">Tantangan</button></div></div><div class="mascot-wrap"><div class="burst">🔥${s.st}</div><div class="mascot">${mas()}</div></div></div><div class="card"><div class="row"><div class="grow"><h2 class="s">Hai, ${esc(m.name)}!</h2><span>${s.lv[2]} <b>${s.lv[1]}</b> · ${s.xp} XP · Level belajar ${s.ul+1}</span></div></div>
 <div class="bar2" style="margin:10px 0 4px"><i style="width:${s.pct}%"></i></div><small class="mut">${s.next?(s.next[0]-s.xp)+' XP lagi menuju '+s.next[2]+' '+s.next[1]:'Level tertinggi! 👑'}</small></div>
 <div class="g3"><div class="card" style="padding:10px"><b>🔥 ${s.st}</b><span>Streak</span></div><div class="card" style="padding:10px"><b>${s.d30}</b><span>Hari / 30h</span></div><div class="card" style="padding:10px"><b>${s.min}</b><span>Total menit</span></div></div>
-<div class="card fm"><h2 class="s">${t?'✅ Sudah latihan hari ini ('+t+' mnt)':'Latihan hari ini?'}</h2><div class="row"><input id="mn" type="number" min="1" max="240" value="15" style="width:90px"><span class="mut">menit</span><button class="b on grow" data-x="log">${t?'Tambah menit':'Catat latihan'}</button></div>
+${missions(m)}<div class="card fm"><h2 class="s">${t?'✅ Sudah latihan hari ini ('+t+' mnt)':'Latihan hari ini?'}</h2><div class="row"><input id="mn" type="number" min="1" max="240" value="15" style="width:90px"><span class="mut">menit</span><button class="b on grow" data-x="log">${t?'Tambah menit':'Catat latihan'}</button></div>
 <div class="cal">${Array.from({length:28},(_,i)=>{const v=L[ago(27-i)]||0;return`<i class="${v>=15?'c':v?'a':''}" title="${ago(27-i)}: ${v} mnt"></i>`}).join('')}</div></div>
 <div class="card"><h2 class="s">📚 PR kamu</h2>${my.map(h=>{const d=(m.done||{})[h.id],od=h.due&&h.due<ago(0)&&!d;return`<div class="it ${d?'dn':''}"><input type="checkbox" data-x="pr" data-id="${h.id}" ${d?'checked':''} style="width:22px;height:22px"><div class="grow"><b>${esc(h.title)}</b>${h.to!='all'?' <small>(khusus kamu)</small>':''}<br><small>${esc(h.desc)}</small>${h.chords&&h.chords.length?'<br>'+chips(h.chords):''}${h.due?`<br><small class="${od?'warn':'mut'}">Tenggat ${h.due}${od?' – terlambat':''}</small>`:''}</div></div>`}).join('')||'<p class="mut">Belum ada PR. 🎉</p>'}</div>`}
 function guru(){const r=sd.filter(x=>x.name).map(x=>({...x,s:stat(x)})).sort((a,b)=>a.name.localeCompare(b.name));
- return`<div class="card"><h2 class="s">👩‍🏫 Dashboard guru</h2><p class="mut" style="margin:0">Ketuk lingkaran sub level untuk menyetujui / membatalkan. ⏳ = diajukan murid, angka = total menit latihan.</p>${r.map(x=>{const mine=hw.filter(h=>h.to=='all'||h.to==x.id),dn=mine.filter(h=>(x.done||{})[h.id]).length,idle=x.s.last<ago(3);return`<div class="it"><div class="grow"><b>${esc(x.name)}</b> <small>${x.s.lv[2]} ${x.s.lv[1]} · Lv ${x.s.ul+1}</small>${rd(x)}${subs(x)}${x.s.ul<L().length-1?`<br><button class="b" data-x="pass" data-id="${x.id}" style="margin-top:4px">✅ Beri izin naik dari Level ${x.s.ul+1}</button>`:''}<br><small class="${idle?'warn':'mut'}">Terakhir latihan: ${x.s.last}${idle?' ⚠️':''}</small></div><div style="text-align:right"><b>🔥 ${x.s.st}</b> · ${x.s.d30}/30<br><small>PR ${dn}/${mine.length}</small></div></div>`}).join('')||'<p class="mut">Belum ada murid yang bergabung. Bagikan link halaman ini.</p>'}</div>
+ return`${gsum(r)}<div class="card"><h2 class="s">👩‍🏫 Dashboard guru</h2><p class="mut" style="margin:0">Ketuk lingkaran sub level untuk menyetujui / membatalkan. ⏳ = diajukan murid, angka = total menit latihan.</p>${r.map(x=>{const mine=hw.filter(h=>h.to=='all'||h.to==x.id),dn=mine.filter(h=>(x.done||{})[h.id]).length,idle=x.s.last<ago(3);return`<div class="it"><div class="grow"><b>${esc(x.name)}</b> <small>${x.s.lv[2]} ${x.s.lv[1]} · Lv ${x.s.ul+1}</small>${rd(x)}${subs(x)}${x.s.ul<L().length-1?`<br><button class="b" data-x="pass" data-id="${x.id}" style="margin-top:4px">✅ Beri izin naik dari Level ${x.s.ul+1}</button>`:''}<br><small class="${idle?'warn':'mut'}">Terakhir latihan: ${x.s.last}${idle?' ⚠️':''}</small></div><div style="text-align:right"><b>🔥 ${x.s.st}</b> · ${x.s.d30}/30<br><small>PR ${dn}/${mine.length}</small></div></div>`}).join('')||'<p class="mut">Belum ada murid yang bergabung. Bagikan link halaman ini.</p>'}</div>
 <div class="card fm"><h2 class="s">➕ Beri PR baru</h2><input id="ht" placeholder="Judul PR (mis. Pindah G ke C)"><textarea id="hd" rows="2" placeholder="Keterangan / cara latihan"></textarea><input id="hc" placeholder="Chord, pisah koma (mis. G, C, Am, F#m)"><div class="row"><input id="hu" type="date"><select id="hto" class="grow"><option value="all">Semua murid</option>${r.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></div><button class="b on" data-x="addpr">Kirim PR</button></div>
 <div class="card"><h2 class="s">Daftar PR</h2>${hw.slice().sort((a,b)=>b.created-a.created).map(h=>`<div class="it"><div class="grow"><b>${esc(h.title)}</b> <small>→ ${h.to=='all'?'semua':esc((sd.find(x=>x.id==h.to)||{}).name||'?')}${h.due?' · '+h.due:''}</small><br>${chips(h.chords)}</div><button class="b" data-x="delpr" data-id="${h.id}">Hapus</button></div>`).join('')||'<p class="mut">Belum ada PR.</p>'}</div>`}
-const login=()=>`<div class="card fm login"><div class="mascot">🎸</div><h2 class="s">Les Gitar</h2><p class="mut" style="margin:0">Masuk pakai username & password dari guru.</p><input id="lu" placeholder="Username" autocapitalize="none" autocorrect="off" autocomplete="username"><input id="lp" type="password" placeholder="Password" autocomplete="current-password"><button class="b on" data-x="login">MASUK</button></div>`;
-function R0(){const v=Q('#vh');Q('#nav').innerHTML=[['home','🏠','Beranda'],['learn','📘',teacher?'Modul':'Belajar'],['rank','🏆','Peringkat'],['chords','🎸','Chord']].concat(db?[['out','🚪','Keluar']]:[]).map(([k,i,l])=>`<button class="b ${tab==k?'on':''}" data-x="tab" data-v="${k}"><span>${i}</span>${l}</button>`).join('');
+const login=()=>`<div class="card fm login"><div class="mascot">${mas()}</div><h1 class="brand">STREET CHORDS</h1><p class="mut" style="margin:0">Play. Learn. Level Up.<br>Masuk pakai username & password dari guru.</p><input id="lu" value="${esc(lu0)}" placeholder="Username" aria-label="Username" autocapitalize="none" autocorrect="off" autocomplete="username"><div class="row"><input id="lp" class="grow" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password"><button class="b" data-x="pw" aria-label="Tampilkan password">👁</button></div><button class="b on" data-x="login" ${lg?'disabled':''}>${lg?'Masuk…':'MASUK'}</button></div>`;
+function R0(){const v=Q('#vh');if(tab!='play'&&mt.run)mstop();if(ready&&db)chkAch();Q('#nav').innerHTML=[['home','🏠','Beranda'],['learn','📘',teacher?'Modul':'Belajar'],['chords','🎸','Chord']].concat(teacher?[]:[['play','⚡','Tantangan']]).concat([['rank','🏆','Peringkat']]).concat(db?[['out','🚪','Keluar']]:[]).map(([k,i,l])=>`<button class="b ${tab==k?'on':''}" data-x="tab" data-v="${k}"><span>${i}</span>${l}</button>`).join('');
  Q('#vc').hidden=tab!='chords';v.hidden=tab=='chords';if(tab=='chords')return;
- v.innerHTML=`<div class="wrap">${err?`<div class="card warn">${esc(err)}</div>`:''}${!ready?'<div class="card">Memuat…</div>':!db?login():tab=='rank'?board():tab=='learn'?(teacher?modt():learn()):teacher?guru():student()}</div>`}
+ v.innerHTML=`<div class="wrap">${err?`<div class="card warn">${esc(err)}</div>`:''}${!ready?'<div class="card">Memuat…</div>':!db?login():tab=='rank'?board():tab=='play'?(teacher?guru():play()):tab=='learn'?(teacher?modt():learn()):teacher?guru():student()}</div>`}
 function showChord(c){sel='';c=norm(c.trim());const r=N.indexOf(c.replace(/(m|7)$/,''));if(r<0)return;tab='chords';R();pick(r,/m$/.test(c)?'min':/7$/.test(c)?'7':'maj','open')}
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-x]');if(!b)return;const d=b.dataset,g=i=>Q(i).value;
  if(d.x=='tab'){if(d.v=='out'){tab='home';auth&&auth.signOut()}else{tab=d.v;R()}}else if(d.x=='sort'){sort=d.v;R()}else if(d.x=='ch')showChord(d.c);
- else if(d.x=='login'){const u=g('#lu').trim().toLowerCase(),p=g('#lp');if(!u||!p||!auth)return;err='';auth.signInWithEmailAndPassword(u+'@'+DOMAIN,p).catch(()=>{err='Username atau password salah.';R()})}
- else if(d.x=='join'){const n=g('#nm').trim();if(n)save({name:n,logs:{},done:{}})}
+ else if(d.x=='login'){const u=g('#lu').trim().toLowerCase(),p=g('#lp');if(!u||!p||!auth)return;err='';if(lg)return;lu0=u;lg=1;R();auth.signInWithEmailAndPassword(u+'@'+DOMAIN,p).catch(x=>{lg=0;err=/network/.test(x.code||'')?'Koneksi internet bermasalah. Coba lagi.':/too-many/.test(x.code||'')?'Terlalu banyak percobaan. Tunggu sebentar.':'Username atau password salah.';R()})}
+ else if(d.x=='pw'){const i=Q('#lp');i.type=i.type=='password'?'text':'password'}else if(d.x=='join'){const n=g('#nm').trim();if(n)save({name:n,logs:{},done:{}})}
  else if(d.x=='log'){const m=plain(me()),n=Math.max(1,Math.min(240,+g('#mn')||15));m.logs={...m.logs,[ago(0)]:(m.logs[ago(0)]||0)+n};save(m);toast('🔥 Latihan tercatat!')}
  else if(d.x=='addpr'){const t=g('#ht').trim();if(!t)return;try{await db.collection('homework').add({title:t,desc:g('#hd').trim(),chords:g('#hc').split(',').map(x=>x.trim()).filter(Boolean),due:g('#hu'),to:g('#hto'),created:Date.now()})}catch(x){err=x.message;R()}}
  else if(d.x=='delpr'){try{await db.collection('homework').doc(d.id).delete()}catch(x){err=x.message;R()}}});
@@ -260,23 +338,23 @@ const subs=x=>L().map((l,i)=>{const ms=ML(l.id).filter(y=>y.pub);if(!ms.length)r
 const rd=x=>{const n=L().filter(l=>(x.ready||{})[l.id]).map(l=>esc(l.name));return n.length?`<br><small class="warn">🙋 Minta izin naik dari: ${n.join(', ')}</small>`:''};
 const vid=u=>/^https?:\/\//.test(u||'')?`<br><a href="${esc(u)}" target="_blank" rel="noopener">👉 pencet link ini yah:)</a>`:'';
 const mcard=(x,m)=>{const dn=(m.mods||{})[x.id]==ago(0);return`<div class="it ${dn?'dn':''}"><input type="checkbox" data-x="md" data-id="${x.id}" ${dn?'checked':''} style="width:22px;height:22px"><div class="grow"><b>${esc(x.title)}</b>${x.min?` <small>· ${x.min} mnt</small>`:''}<br><small style="white-space:pre-wrap">${esc(x.body)}</small>${x.target?`<br>🎯 ${esc(x.target)}`:''}${x.chords&&x.chords.length?'<br>'+chips(x.chords):''}${vid(x.video)}</div></div>`};
-const PAL=['#58cc02','#1cb0f6','#ce82ff','#ff9600','#ff4b4b'],TH=['🌲','⛰️','🏝️','🌋','🏰'],OF=[0,46,70,46,0,-46,-70,-46];
+const PAL=['#FF6B24','#2864E8','#13a89a','#d99a00','#20232A'],TH=['🎸','🏙️','🥁','🛹','🎤'],OF=[0,46,70,46,0,-46,-70,-46];
 function learn(){const m=me();if(!m||!m.name)return student();const ls=L(),u=Math.min(m.unlocked||0,Math.max(ls.length-1,0)),s=stat(m),AP=m.appr||{},SM=m.sm||{},RQ=m.req||{};
  if(!ls.length)return'<div class="card mut">Guru belum membuat level. Sabar ya! 🎸</div>';
  let pop='';
- const out=`<div class="card row top-stats"><b class="grow">🔥 ${s.st} hari</b><b>${s.lv[2]} ${s.xp} XP</b></div>`+ls.map((l,i)=>{const c=PAL[i%5],ms=ML(l.id).filter(x=>x.pub),lock=i>u,dn=ms.filter(x=>AP[x.id]).length;
- const bn=`<div class="lb" style="background:${lock?'var(--line)':c};color:${lock?'var(--mut)':'#fff'}"><div><small>LEVEL ${i+1}${i<u?' · LULUS ✅':''}</small><br><b>${esc(l.name)}</b></div><span>${lock?'🔒':TH[i%5]}</span>${lock?'<small class="lbp">Menunggu izin guru</small>':`<small class="lbp">${dn}/${ms.length} sub level disetujui guru</small>`}</div>`;
+ const out=`<div class="card row top-stats"><b class="grow">🔥 ${s.st} hari</b><b>${s.lv[2]} ${s.xp} XP</b></div>`+zmap(ls,u)+ls.map((l,i)=>{const c=PAL[i%5],ms=ML(l.id).filter(x=>x.pub),lock=i>u,dn=ms.filter(x=>AP[x.id]).length;
+ const bn=`<div class="lb" id="z${i}" style="background:${lock?'var(--line)':c};color:${lock?'var(--mut)':'#fff'}"><div><small>LEVEL ${i+1}${i<u?' · LULUS ✅':''}</small><br><b>${esc(l.name)}</b></div><span>${lock?'🔒':TH[i%5]}</span>${lock?'<small class="lbp">Menunggu izin guru</small>':`<small class="lbp">${dn}/${ms.length} sub level disetujui guru</small>`}</div>`;
  if(lock)return bn+`<div class="path">${[0,1,2].map(k=>`<div class="nd" style="transform:translateX(${OF[k]}px)"><div class="node lk">🔒</div></div>`).join('')}</div>`;
  let h=bn+'<div class="path">';
  const cur=ms.find(y=>!AP[y.id]);
  ms.forEach((x,k)=>{const d=!!AP[x.id],rq=RQ[x.id],mn=SM[x.id]||0;
-  h+=`<div class="nd" style="transform:translateX(${OF[k%8]}px)">${x===cur?'<div class="go">MULAI</div>':''}<button class="node ${d?'dn':''} ${x===cur?'cur':''}" style="${d?'':'background:'+c}" data-x="nd" data-id="${x.id}" aria-label="${esc(x.title)}">${d?'⭐':rq?'⏳':'🎸'}</button><small>${esc(x.title)}${mn?`<br>${mn} mnt`:''}</small></div>`;
+  h+=`<div class="nd" style="transform:translateX(${OF[k%8]}px)">${tkm(x.id)}<button class="node ${d?'dn':''} ${x===cur?'cur':''}" style="${d?'':'background:'+c}" data-x="nd" data-id="${x.id}" aria-label="${esc(x.title)}">${d?'⭐':rq?'⏳':'🎸'}</button><small>${esc(x.title)}${mn?`<br>${mn} mnt`:''}</small>${tko(x.id)}</div>`;
   if(sel==x.id)pop=`<div class="ov" data-x="cls"><div class="mdl" style="--c:${c}"><div class="row"><b class="grow" style="font-size:20px">${i+1}.${k+1} ${esc(x.title)}</b><button class="b" data-x="cls" aria-label="Tutup">✕</button></div>${x.min?`<small class="mut">Target latihan: ${x.min} mnt</small>`:''}<div style="white-space:pre-wrap;line-height:1.6">${fmt(x.body)}</div>${x.target?`<div>🎯 ${esc(x.target)}</div>`:''}${x.chords&&x.chords.length?'<div>'+chips(x.chords)+'</div>':''}${vid(x.video)}<div class="stt ${d?'ap':rq?'rq':''}">${d?'✅ Disetujui guru':rq?'⏳ Menunggu persetujuan guru':'Belum disetujui guru'}</div><div>Total latihan: <b>${mn} menit</b></div><div class="row"><input id="sm" type="number" min="1" max="240" placeholder="Menit" style="width:100px"><button class="b on grow" data-x="smin" data-id="${x.id}">➕ Simpan progres</button></div>${d?'':`<button class="b" style="width:100%" data-x="req" data-id="${x.id}">${rq?'↩ Batalkan pengajuan':'🙋 Ajukan ke guru'}</button>`}</div></div>`});
  if(!ms.length)h+='<p class="mut">Belum ada sub level di level ini.</p>';
  if(i==u&&i<ls.length-1){const b='b'+l.id,rr=(m.ready||{})[l.id];
-  h+=`<div class="nd" style="transform:translateX(${OF[ms.length%8]}px)"><button class="node boss" data-x="nd" data-id="${b}">🏆</button><small>Naik level</small></div>`;
+  h+=`<div class="nd" style="transform:translateX(${OF[ms.length%8]}px)">${tkm(b)}<button class="node boss" data-x="nd" data-id="${b}">🏆</button><small>Naik level</small>${tko(b)}</div>`;
   if(sel==b)pop=`<div class="ov" data-x="cls"><div class="mdl" style="--c:${c}"><div class="row"><b class="grow" style="font-size:20px">🏆 Naik level</b><button class="b" data-x="cls" aria-label="Tutup">✕</button></div><p style="margin:0">Level berikutnya terkunci dan hanya bisa dibuka oleh guru. Sudah lancar? Minta izin guru di sini.</p><button class="b ${rr?'on':''}" style="width:100%" data-x="rdy" data-id="${l.id}">${rr?'🙋 Izin diminta (batalkan)':'🙋 Minta izin naik level'}</button></div></div>`}
- else if(i==u)h+='<div class="nd"><div class="node boss">👑</div><small>Level terakhir!</small></div>';
+ else if(i==u)h+='<div class="nd">'+tkm('b'+l.id)+'<div class="node boss">👑</div><small>Level terakhir!</small>'+tko('b'+l.id)+'</div>';
  return h+'</div>'}).join('');
  return out+pop}
 function modt(){const ls=L(),e=mods.find(x=>x.id==ed)||{};
@@ -285,6 +363,45 @@ function modt(){const ls=L(),e=mods.find(x=>x.id==ed)||{};
  ${ls.map((l,i)=>{const ms=ML(l.id),open=ed=='new:'+l.id||(e.id&&e.level==l.id);return`<div class="card"><div class="row"><b class="grow">Level ${i+1} – ${esc(l.name)}<br><small class="mut">${ms.filter(x=>x.pub).length} lingkaran di jalur</small></b><button class="b" data-x="lup" data-id="${l.id}">▲</button><button class="b" data-x="ldn" data-id="${l.id}">▼</button><button class="b" data-x="dell" data-id="${l.id}">Hapus</button></div>
  ${ms.map((x,k)=>`<div class="it ${x.pub?'':'dn'}"><div class="grow"><b>${i+1}.${k+1} ${esc(x.title)}</b> <small>${x.pub?'':'(draf)'}${x.min?' · target '+x.min+' mnt':''}</small></div><button class="b" data-x="mup" data-id="${x.id}">▲</button><button class="b" data-x="mdn" data-id="${x.id}">▼</button><button class="b" data-x="med" data-id="${x.id}">Ubah</button><button class="b" data-x="mdup" data-id="${x.id}">Salin</button><button class="b" data-x="mdel" data-id="${x.id}">✕</button></div>`).join('')||'<p class="mut">Belum ada sub level.</p>'}
  ${open?fm(l.id):`<button class="b on" style="margin-top:10px;width:100%" data-x="mnew" data-id="${l.id}">➕ Sub level</button>`}</div>`}).join('')||'<p class="mut">Buat level dulu.</p>'}`}
+/* ===== STREET CHORDS: maskot, misi harian, achievement, transisi chord, metronome ===== */
+let lg=0,lu0='',awarding=0;
+const RIFF=`<svg viewBox="0 0 300 340" role="img" aria-label="Riff, a smiling teen guitarist in oversized streetwear, headphones and sneakers"> <ellipse cx="150" cy="328" rx="117" ry="9" fill="#20242c" opacity=".25"/> <g transform="rotate(-9 142 311)"><rect x="49" y="299" width="205" height="17" rx="8" fill="#20242c"/><rect x="58" y="300" width="186" height="9" rx="4" fill="#ffdc49"/><circle cx="84" cy="321" r="9" fill="#20242c"/><circle cx="218" cy="321" r="9" fill="#20242c"/></g> <path d="M120 237L113 290L143 292L155 248M169 238L179 290L207 288L197 226" fill="#27334d" stroke="#20242c" stroke-width="5" stroke-linejoin="round"/> <path d="M105 288q-16 5-17 17h61l-3-17zM178 287q-5 13 2 18h57q0-14-28-19z" fill="#fff" stroke="#20242c" stroke-width="5"/><path d="M93 301h50M182 301h49" stroke="#ff6b35" stroke-width="5"/> <path d="M111 143Q84 146 77 200L92 242Q148 260 207 237L219 184Q211 146 180 142Z" fill="#3265ed" stroke="#20242c" stroke-width="6" stroke-linejoin="round"/> <path d="M135 145l16 30 22-30M92 214l18 5M195 217l15-5" fill="none" stroke="#20242c" stroke-width="4"/><path d="M131 152l20 41 28-44" fill="none" stroke="#fff" stroke-width="5"/><text x="148" y="224" fill="#fff" font-size="22" font-family="sans-serif" font-weight="900" transform="rotate(-7 148 224)">SC!</text> <path d="M111 153Q91 158 79 187L65 218l20 12 35-52M189 155q30 7 38 42l-15 35-20-11 9-34" fill="#3265ed" stroke="#20242c" stroke-width="6" stroke-linejoin="round"/> <circle cx="74" cy="225" r="13" fill="#bc7952" stroke="#20242c" stroke-width="4"/><circle cx="213" cy="229" r="13" fill="#bc7952" stroke="#20242c" stroke-width="4"/> <path d="M135 119v31q16 14 33 0v-33" fill="#bc7952" stroke="#20242c" stroke-width="4"/> <ellipse cx="150" cy="88" rx="52" ry="58" fill="#c88960" stroke="#20242c" stroke-width="5"/> <path d="M99 88Q90 26 146 23q54-2 57 56-18-12-21-34-31 28-83 26" fill="#20242c" stroke="#20242c" stroke-width="5"/> <path d="M121 89q7-5 13 0M167 88q7-5 13 0" fill="none" stroke="#20242c" stroke-width="4" stroke-linecap="round"/><circle cx="130" cy="94" r="3" fill="#20242c"/><circle cx="174" cy="93" r="3" fill="#20242c"/><path d="M140 118q13 11 25-1" fill="none" stroke="#20242c" stroke-width="4" stroke-linecap="round"/> <path d="M97 79q-7-51 53-52 56 0 57 53" fill="none" stroke="#ffdc49" stroke-width="10"/><rect x="88" y="76" width="17" height="40" rx="8" fill="#ff6b35" stroke="#20242c" stroke-width="4"/><rect x="197" y="74" width="17" height="40" rx="8" fill="#ff6b35" stroke="#20242c" stroke-width="4"/> <g transform="rotate(-30 165 218)"><rect x="158" y="127" width="16" height="126" rx="5" fill="#e8ae65" stroke="#20242c" stroke-width="4"/><rect x="156" y="120" width="20" height="26" rx="4" fill="#e8ae65" stroke="#20242c" stroke-width="4"/><circle cx="152" cy="126" r="3" fill="#20242c"/><circle cx="180" cy="126" r="3" fill="#20242c"/><path d="M169 245q-39-15-49 19-6 35 41 40 48 0 57-30 3-23-49-29z" fill="#ff6b35" stroke="#20242c" stroke-width="5"/><circle cx="166" cy="269" r="13" fill="#ffdc49" stroke="#20242c" stroke-width="4"/><path d="M162 137v133m4-133v133m4-133v133" stroke="#fff" stroke-width="1.5"/></g> <path d="M75 220q25 9 40 22M215 224q-22 13-38 21" fill="none" stroke="#20242c" stroke-width="4"/> </svg>`,mas=j=>j?RIFF.split('#3265ed').join(j):RIFF;
+const MS=[{id:'p10',t:'Latihan 10 menit hari ini',g:10,xp:15,v:m=>(m.logs||{})[ago(0)]||0},
+ {id:'mod',t:'Selesaikan 1 materi hari ini',g:1,xp:10,v:m=>Object.values(m.mods||{}).filter(x=>x==ago(0)).length},
+ {id:'tr',t:'Transisi chord 10x hari ini',g:10,xp:15,v:m=>(m.trd||{})[ago(0)]||0}];
+const claimed=(m,id)=>!!(m.dm&&m.dm.d==ago(0)&&(m.dm.c||{})[id]);
+const missions=m=>`<div class="card"><h2 class="s">🎯 Misi harian</h2>${MS.map(x=>{const v=Math.min(x.g,x.v(m)),ok=v>=x.g,cl=claimed(m,x.id);return`<div class="mi"><div class="grow"><b>${x.t}</b><small class="mut">${v}/${x.g} · +${x.xp} XP</small><div class="bar2" style="margin-top:4px"><i style="width:${v/x.g*100}%"></i></div></div>${cl?'<b>✅</b>':`<button class="b ${ok?'on':''}" data-x="mclaim" data-id="${x.id}" ${ok?'':'disabled'}>Klaim</button>`}</div>`}).join('')}<small class="mut">Reset setiap hari (WIB).</small></div>`;
+const AC=[['first','First Chord','Selesaikan materi pertamamu','🎸',(m,s)=>(m.mc||0)>=1],['master','Chord Master','5 sub level disetujui guru','🏅',m=>Object.keys(m.appr||{}).length>=5],['rhythm','Rhythm Warrior','5 sesi metronome (min. 30 dtk)','🥁',m=>(m.met||0)>=5],['s7','7-Day Streak','Latihan 7 hari berturut-turut','🔥',(m,s)=>s.st>=7],['champ','Practice Champion','Total latihan 300 menit','🏆',(m,s)=>s.min>=300],['street','Street Performer','Lulus satu level (izin guru)','🎤',m=>(m.unlocked||0)>=1]];
+function chkAch(){const m=me();if(!m||!m.name||teacher||awarding)return;const s=stat(m),a=m.ach||{},n=AC.filter(x=>!a[x[0]]&&x[4](m,s));if(!n.length)return;awarding=1;const p=plain(m);p.ach={...a};n.forEach(x=>p.ach[x[0]]=ago(0));save(p).then(()=>{awarding=0;toast('🏅 Achievement: '+n[0][1])})}
+const PRE=['G-C','C-D','Em-Am','G-D-Em-C'],tc={seq:'G-C',reps:10,n:0,run:0,t0:0,el:0,id:0},mt={bpm:90,run:0,beats:4,i:0,ctx:null,id:0,t0:0};
+const fT=ms=>(ms/1000).toFixed(1)+' dtk';
+const play=()=>{const m=me();if(!m||!m.name)return student();const a=m.ach||{};
+ return`<div class="card fm"><h2 class="s">⚡ Chord Transition Challenge</h2><div class="seg">${PRE.map(p=>`<button class="chip ${tc.seq==p?'on':''}" data-x="tcs" data-v="${p}">${p.replace(/-/g,' → ')}</button>`).join('')}</div><div class="row"><span class="mut">Target</span><select id="tcr" aria-label="Jumlah pengulangan">${[5,10,20,30].map(n=>`<option ${n==tc.reps?'selected':''}>${n}</option>`).join('')}</select><span class="mut">perpindahan</span></div><div class="g3"><div><b>${tc.n}/${tc.reps}</b><span>Berhasil</span></div><div><b id="tct">${tc.run?'…':fT(tc.el)}</b><span>Waktu</span></div><div><b>${m.trn||0}</b><span>Total</span></div></div><div class="row"><button class="b on grow" data-x="tcb">${tc.run?'✅ +1 Berhasil':'▶ Mulai'}</button>${tc.run?'<button class="b" data-x="tcf">Selesai</button>':''}</div><small class="mut">Ketuk saat kamu berhasil pindah chord dengan bersih. Pencatatan manual — aplikasi belum mendeteksi suara.</small></div>
+<div class="card fm"><h2 class="s">🥁 Rhythm Trainer</h2><div class="bpmv"><span id="bpv">${mt.bpm}</span> <small class="mut">BPM</small></div><input id="bpm" type="range" min="40" max="200" value="${mt.bpm}" aria-label="Tempo BPM"><div class="seg">${[3,4,6].map(n=>`<button class="chip ${mt.beats==n?'on':''}" data-x="mbt" data-v="${n}">${n} ketukan</button>`).join('')}</div><div class="beats">${Array.from({length:mt.beats},()=>'<i class="bd"></i>').join('')}</div><button class="b on" data-x="mst">${mt.run?'⏹ Berhenti':'▶ Mulai'}</button></div>
+<div class="card"><h2 class="s">🏅 Achievement</h2><div class="acs">${AC.map(x=>`<div class="ac ${a[x[0]]?'on2':''}"><span>${x[3]}</span><b>${x[1]}</b><br><small class="mut">${a[x[0]]?'Diperoleh '+a[x[0]]:x[2]}</small></div>`).join('')}</div></div>`};
+function mtick(){const c=mt.ctx,o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.frequency.value=mt.i%mt.beats?700:1100;g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.08);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.09);document.querySelectorAll('.bd').forEach((e,k)=>e.classList.toggle('lit',k==mt.i%mt.beats));mt.i++}
+function mstop(){clearInterval(mt.id);const el=Date.now()-mt.t0;mt.run=0;document.querySelectorAll('.bd').forEach(e=>e.classList.remove('lit'));const m=me();if(el>=30000&&m&&m.name&&!teacher){const p=plain(m);p.met=(p.met||0)+1;save(p)}else R()}
+document.addEventListener('input',e=>{if(e.target.id=='bpm'){mt.bpm=+e.target.value;Q('#bpv').textContent=mt.bpm;if(mt.run){clearInterval(mt.id);mt.id=setInterval(mtick,60000/mt.bpm)}}if(e.target.id=='tcr'&&!tc.run){tc.reps=+e.target.value;R()}});
+document.addEventListener('change',e=>{if(e.target.id=='tcr'&&!tc.run){tc.reps=+e.target.value;R()}});
+function tcend(){clearInterval(tc.id);const m=me();tc.run=0;tc.el=Date.now()-tc.t0;if(m&&tc.n>0){const p=plain(m);p.trn=(p.trn||0)+tc.n;p.trd={...p.trd,[ago(0)]:((p.trd||{})[ago(0)]||0)+tc.n};save(p);toast('⚡ '+tc.n+' perpindahan tercatat!')}else R()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-x]');if(!b||!db)return;const d=b.dataset;
+ if(d.x=='mclaim'){const m=me(),x=MS.find(y=>y.id==d.id);if(!m||!x||teacher||claimed(m,x.id)||x.v(m)<x.g)return;const p=plain(m),dm=p.dm&&p.dm.d==ago(0)?p.dm:{d:ago(0),c:{}};p.dm={d:dm.d,c:{...dm.c,[x.id]:1}};p.mxp=(p.mxp||0)+x.xp;save(p);toast('🎯 +'+x.xp+' XP')}
+ else if(d.x=='tcs'&&!tc.run){tc.seq=d.v;tc.n=0;tc.el=0;R()}
+ else if(d.x=='tcb'){if(!tc.run){tc.run=1;tc.n=0;tc.t0=Date.now();tc.id=setInterval(()=>{const e=Q('#tct');if(e)e.textContent=fT(Date.now()-tc.t0)},100);R()}else{tc.n++;if(tc.n>=tc.reps)tcend();else R()}}
+ else if(d.x=='tcf'&&tc.run)tcend();
+ else if(d.x=='mbt'&&!mt.run){mt.beats=+d.v;R()}
+ else if(d.x=='mst'){if(mt.run){mstop()}else{mt.ctx=mt.ctx||new(window.AudioContext||window.webkitAudioContext)();mt.ctx.resume();mt.run=1;mt.i=0;mt.t0=Date.now();mt.id=setInterval(mtick,60000/mt.bpm);mtick();R()}}});
+const gsum=r=>{const ia=r.filter(x=>x.s.last>=ago(3)),pq=r.reduce((a,x)=>a+Object.keys(x.req||{}).length,0),rdy=r.filter(x=>Object.keys(x.ready||{}).length).length,idle=r.filter(x=>x.s.last<ago(3));return`<div class="g3 g4"><div class="card"><b>${r.length}</b><span>Siswa</span></div><div class="card"><b>${ia.length}</b><span>Aktif 3 hari</span></div><div class="card"><b>${pq}</b><span>Ajuan sublevel</span></div><div class="card"><b>${rdy}</b><span>Minta naik</span></div></div>${idle.length?`<div class="card warn">Perlu perhatian (belum latihan 3 hari): ${idle.map(x=>esc(x.name)).join(', ')}</div>`:''}`};
+
+/* ===== Peta zona + posisi pemain (ala papan Ludo) ===== */
+const JC=['#ff6b35','#38d6c3','#a34fe4','#ffdc49','#e0457b','#3265ed','#62c7a6'];
+const spos=x=>{const ls=L();if(!ls.length)return null;const u=Math.min(x.unlocked||0,ls.length-1),l=ls[u],c=ML(l.id).filter(y=>y.pub).find(y=>!(x.appr||{})[y.id]);return{lv:u,nd:c?c.id:'b'+l.id}};
+const peers=()=>sd.filter(x=>x.name).slice().sort((a,b)=>a.id<b.id?-1:1).map((x,i)=>({x,i,p:spos(x)})).filter(o=>o.p);
+const tkm=nd=>peers().some(o=>o.p.nd==nd&&o.x.id==uid)?`<div class="tk me" title="Posisimu">${mas()}<b>KAMU</b></div>`:'';
+const tko=nd=>{const a=peers().filter(o=>o.p.nd==nd&&o.x.id!=uid);return a.length?`<div class="tks">${a.slice(0,4).map(o=>`<span class="tk" title="${esc(o.x.name)}">${mas(JC[o.i%7])}<em>${esc(o.x.name.split(' ')[0].slice(0,7))}</em></span>`).join('')}${a.length>4?`<small>+${a.length-4}</small>`:''}</div>`:''};
+const zmap=(ls,u)=>{const pe=peers();return`<div class="card"><h2 class="s">🗺️ Peta zona</h2><small class="mut">Lihat di mana kamu dan teman-temanmu berdiri. Ketuk zona untuk loncat ke sana.</small><div class="zpath">${ls.map((l,i)=>{const h=pe.filter(o=>o.p.lv==i),lk=i>u;return`<button class="zn ${lk?'lk':''} ${i==u?'cur':''}" data-x="zn" data-i="${i}" style="--c:${PAL[i%5]};transform:translateX(${[0,46,0,-46][i%4]}px)"><span class="zi">${lk?'🔒':TH[i%5]}</span><span class="zt"><b>${esc(l.name)}</b><small>Zona ${i+1}${i<u?' · lulus':''}</small></span><span class="zk">${h.slice(0,5).map(o=>`<i class="zd ${o.x.id==uid?'me':''}" title="${esc(o.x.name)}" style="--j:${JC[o.i%7]}">${esc(o.x.name.charAt(0).toUpperCase())}</i>`).join('')}${h.length>5?'<small>+'+(h.length-5)+'</small>':''}</span></button>`}).join('')}</div></div>`};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-x=zn]');if(!b)return;const z=Q('#z'+b.dataset.i);if(z)z.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})});
+
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&sel){sel='';R()}if(e.key=='Enter'&&e.target.id=='lp')Q('[data-x=login]').click()});
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-x]');if(!b||!db)return;const d=b.dataset,g=i=>Q(i).value,C=n=>db.collection(n),fx=async f=>{try{await f()}catch(x){err=x.message;R()}};
  switch(d.x){
@@ -309,7 +426,7 @@ R();
 const cfgOk=!/^ISI/.test(FIREBASE_CONFIG.apiKey);let auth=null,un=[];
 if(!cfgOk){err='Firebase belum diatur: isi FIREBASE_CONFIG di bagian atas script.';ready=true;R()}
 else{firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();const fs=firebase.firestore();
- auth.onAuthStateChanged(async u=>{un.forEach(f=>f());un=[];sd=[];hw=[];lvs=[];mods=[];teacher=false;tab='home';sel='';
+ auth.onAuthStateChanged(async u=>{un.forEach(f=>f());un=[];sd=[];hw=[];lvs=[];mods=[];teacher=false;tab='home';sel='';lg=0;
   if(!u){db=null;uid=null;ready=true;R();return}
   uid=u.uid;const s=(u.email||'').split('@')[0];uname=s.charAt(0).toUpperCase()+s.slice(1);
   try{teacher=(await fs.collection('teachers').doc(uid).get()).exists}catch(e){teacher=false}
