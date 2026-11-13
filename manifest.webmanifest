@@ -1,0 +1,17 @@
+{
+  "name": "NRG! Guitar Club – Les Gitar",
+  "short_name": "Les Gitar",
+  "description": "Latihan gitar, PR, streak, dan achievement bersama NRG! Guitar Club.",
+  "lang": "id",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f4e9",
+  "theme_color": "#20242c",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
