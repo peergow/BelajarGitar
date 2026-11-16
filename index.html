@@ -167,6 +167,70 @@ input[type=range]{width:100%;min-width:0;padding:0;border:0;accent-color:var(--o
 .avp h3{font-size:20px;margin:10px 0 2px;color:var(--ink)}.swr{display:flex;gap:10px;flex-wrap:wrap}
 .swc{width:40px;height:40px;padding:0;border:3px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);cursor:pointer}.swc.sel{outline:4px solid var(--blue);outline-offset:2px}
 .emb{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#fff;border:5px solid var(--c);box-shadow:0 0 0 2px #20242c;font-size:16px;flex:none}.emb.lk{filter:grayscale(1);opacity:.5}.embs{display:flex;flex-wrap:wrap;gap:12px}.eb{display:flex;gap:8px;align-items:center;font-size:12px;line-height:1.2}.gift{margin-top:6px;font-size:12px;font-weight:700;color:#e0457b}.ndot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e0457b;margin-left:3px;vertical-align:top}.ac:not(.on2) .bar2{opacity:1}
+
+/* ===== Perbaikan keterbacaan di HP (CSS saja, data & logic tidak diubah) ===== */
+@media(max-width:760px){
+ body{font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%;overflow-wrap:anywhere}
+ .app,.wrap{padding:12px}
+ #nav{padding-left:4px;padding-right:4px}
+ /* teks kecil & abu-abu dibuat lebih besar dan lebih gelap */
+ :root{--mut:#4a5058}
+ small,.mut,.it small,.foot,.fmt-hint,.zt small,.nd small,.meta span,.st span,.g3 span,.eb,.gift{font-size:14px;line-height:1.4}
+ .meta span,.st span,.g3 span{font-size:12px}
+ .tk em{font-size:13px}
+ #nav .b{font-size:11px;min-height:48px}
+ /* kartu item (PR, murid, daftar PR) */
+ .it{align-items:flex-start;gap:12px;padding:12px;overflow:hidden}
+ .it .grow{font-size:16px;line-height:1.5;overflow-wrap:anywhere}
+ .it .grow small{display:inline-block;margin-top:2px;color:#3d434b}
+ .it.dn{opacity:1;background:#eef7f4}
+ .it.dn .grow>b{text-decoration:line-through;text-decoration-thickness:2px}
+ .it.dn .grow small{color:#3d434b}
+ .it input[type=checkbox]{flex:none;width:28px!important;height:28px!important;margin:2px 0 0;accent-color:var(--root)}
+ .it .chip{font-size:14px;padding:6px 12px!important;margin:2px 2px 2px 0}
+ .it>.b{flex:none;align-self:center}
+ .it>div[style*="text-align:right"]{flex:none;max-width:38%;font-size:14px}
+ .it .b{min-height:44px}
+ .warn{color:#b0360b}
+ /* tombol & input mudah disentuh, font 16px agar iOS tidak zoom */
+ .b,.chip,.vr{min-height:44px;font-size:15px}
+ input,textarea,select{font-size:16px;min-height:44px;max-width:100%;min-width:0}
+ input[type=date]{min-width:0;width:100%}
+ input[type=range]{min-height:0}
+ .row>input,.row>select{flex:1 1 140px}
+ .fm #mb{min-height:240px}
+ /* judul & kartu */
+ h2.s{font-size:26px}
+ .card{padding:14px}
+ .top h2{font-size:20px}
+ /* grid yang terlalu rapat */
+ .st{grid-template-columns:repeat(3,1fr)}
+ .meta{grid-template-columns:repeat(2,1fr)}
+ .acs{grid-template-columns:repeat(2,1fr)}
+ .g4{grid-template-columns:repeat(2,1fr)}
+ .chips{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+ .cal{gap:3px}
+ /* hero */
+ .hero p{font-size:14px}
+ .hero-copy{padding-right:6px}
+ /* peta zona */
+ .zn{width:min(100%,300px)}
+ .zt b{font-size:22px}
+ .zk{max-width:84px}
+ /* modal & notifikasi */
+ .mdl{max-height:88vh;padding:14px;font-size:16px}
+ .ov{padding:10px}
+ .toast{max-width:calc(100vw - 24px);font-size:15px;text-align:center}
+ .lb{font-size:16px}
+ .stt{font-size:14px}
+ .dt{font-size:15px}
+}
+@media(max-width:380px){
+ .hero{grid-template-columns:1fr 110px}
+ .hero h1{font-size:40px}
+ .it>div[style*="text-align:right"]{max-width:34%}
+ .st{grid-template-columns:repeat(2,1fr)}
+}
 </style></head><body>
 <nav id="nav" class="seg"></nav><div id="vh"></div><div id="vc" hidden><div class="app">
 <header><h1>🎸 Chord Explorer</h1><input id="q" placeholder="Cari chord: C, F#m, Bb…" autocomplete="off" aria-label="Cari chord"></header>
